@@ -88,7 +88,7 @@ A score cites public sources only: vendor documentation, public source code, the
 
 A correction fixes a fact: a date, a version, a source, a harness, or the wording of a sentence. Open an issue or a pull request with the source that shows the right fact.
 
-A removal request is not a correction. Rows record public disclosures and are not taken down on request. Only a legal demand can remove one, and even then the demand is contested first.
+A removal request is not a correction. Rows record public disclosures and are not taken down on request. A row is removed only when a valid legal demand requires it.
 
 ## Running the checks
 
