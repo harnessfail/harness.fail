@@ -16,7 +16,7 @@ An issue needs:
 - **A public source.** Primary sources are preferred: an advisory, a CVE record, a vendor announcement, or the researcher's own write-up. Press coverage is fine when no first-hand account is public. Vendor-contributed articles are not sources.
 - **The affected harness**, or harnesses.
 - **The date it was first publicly disclosed.**
-- **One factual sentence on what failed.**
+- **One or two factual sentences on what failed.**
 - **The version that fixed it**, if it was fixed and a source says so.
 
 ## Choosing the class

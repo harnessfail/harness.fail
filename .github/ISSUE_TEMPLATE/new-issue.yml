@@ -35,7 +35,7 @@ body:
     id: fail
     attributes:
       label: What failed
-      description: One factual sentence.
+      description: One or two factual sentences.
     validations:
       required: true
   - type: input
