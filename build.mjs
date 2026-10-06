@@ -603,7 +603,7 @@ const recordMeta = metaLine(
   record.updated,
   plural(record.issues.length, 'issue'),
   plural(record.classes.length, 'class', 'classes'),
-  '<a href="record.json">JSON</a>',
+  link('record.json', 'JSON'),
   ...(record.doi
     ? [link(`https://doi.org/${record.doi}`, `DOI ${record.doi}`)]
     : []),
@@ -624,7 +624,7 @@ const matrixMeta = metaLine(
     matrix.groups.flatMap(group => group.requirements).length,
     'requirement',
   ),
-  '<a href="matrix.json">JSON</a>',
+  link('matrix.json', 'JSON'),
 )
 
 // Built once per mark kind, then reused for every cell.

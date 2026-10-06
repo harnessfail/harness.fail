@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "title": "harness.fail: what AI agent harnesses enforce, scored against abstract requirements",
-  "description": "The capabilities an AI agent harness would need to enforce a file-access policy, as derived from the agentaccess.txt SPEC and written as abstract requirements, with each harness scored against them.",
+  "description": "The capabilities an AI agent harness would need to enforce a file-access policy, as derived from the agentaccess.txt specification and written as abstract requirements, with each harness scored against them.",
   "creator": {
     "name": "Peter Seprus",
     "url": "https://github.com/ppseprus"
