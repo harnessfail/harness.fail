@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: How to contribute
+    url: https://github.com/harnessfail/harness.fail/blob/main/CONTRIBUTING.md
+    about: What qualifies as an issue, the row format, and how scores are disputed.

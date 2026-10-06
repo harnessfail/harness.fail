@@ -1,0 +1,32 @@
+name: Correction
+description: A wrong fact in the Record, the matrix or the landscape shifts.
+title: 'Correction: '
+labels: ['correction']
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        A correction fixes a fact: a date, a version, a source, a harness, a
+        score, or the wording of a sentence. Rows are not taken down on
+        request; see CONTRIBUTING.md.
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: The row title, or the harness and requirement for a matrix score.
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What is wrong, and what is right
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source for the right fact
+      description: A public https link.
+      placeholder: https://
+    validations:
+      required: true

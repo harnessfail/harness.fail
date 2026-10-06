@@ -1,0 +1,27 @@
+name: Fix status update
+description: An issue in the Record has been fixed, or its fix status has changed.
+title: 'Fix status: '
+labels: ['fix status']
+body:
+  - type: input
+    id: row
+    attributes:
+      label: Row
+      description: The row title as it appears on the page.
+    validations:
+      required: true
+  - type: input
+    id: fix
+    attributes:
+      label: New status, and the fixing version or date if fixed
+      description: fixed, partial, disputed or declined; see the fix statuses in CONTRIBUTING.md.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source that states the fix
+      description: A release note, an advisory or a vendor statement; https only.
+      placeholder: https://
+    validations:
+      required: true

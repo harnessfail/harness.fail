@@ -1,0 +1,55 @@
+name: New issue for the Record
+description: An AI agent harness did not hold a boundary it was supposed to hold.
+title: 'New issue: '
+labels: ['new issue']
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        One issue per report. Primary sources are preferred: an advisory, a
+        CVE record, a vendor announcement, or the researcher's own write-up.
+        Press coverage is fine when no first-hand account is public. See
+        CONTRIBUTING.md for what qualifies.
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: A public https link.
+      placeholder: https://
+    validations:
+      required: true
+  - type: input
+    id: harnesses
+    attributes:
+      label: Affected harness or harnesses
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: First public disclosure
+      description: YYYY-MM-DD, or YYYY-MM or YYYY when that is all the source gives.
+    validations:
+      required: true
+  - type: textarea
+    id: fail
+    attributes:
+      label: What failed
+      description: One factual sentence.
+    validations:
+      required: true
+  - type: input
+    id: credit
+    attributes:
+      label: Credit and CVE ids
+      description: Who found or reported it, and any CVE ids.
+  - type: input
+    id: fix
+    attributes:
+      label: Fix
+      description: The fixing version or date, with the source that states it. Leave empty if no source says.
+  - type: input
+    id: class
+    attributes:
+      label: Class (optional)
+      description: The class whose boundary failed, if you have a view.
