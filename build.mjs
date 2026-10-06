@@ -748,7 +748,6 @@ const renderPage = () =>
   }).reduce(fill, readFileSync('src/index.html', 'utf8'))
 
 // ---- write ------------------------------------------------------------------
-const json = data => `${JSON.stringify(data, null, 2)}\n`
 const page = renderPage()
 
 rmSync(OUT, { recursive: true, force: true })
@@ -761,8 +760,10 @@ cpSync('src', OUT, {
   filter: path => !MINIFIED.test(path) && !path.endsWith('index.html'),
 })
 writeFileSync(`${OUT}/index.html`, page)
-writeFileSync(`${OUT}/record.json`, json(record))
-writeFileSync(`${OUT}/matrix.json`, json(matrix))
+// The data files are published as they are, byte for byte, so the served
+// record.json is the same file as the one in data/ (and on Zenodo).
+cpSync('data/record.json', `${OUT}/record.json`)
+cpSync('data/matrix.json', `${OUT}/matrix.json`)
 
 // Every stylesheet and script in src/assets/, so a new one cannot be
 // dropped by the copy above and missed here.
