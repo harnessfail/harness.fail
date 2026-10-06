@@ -1,0 +1,59 @@
+#!/bin/sh
+set -e
+
+# Everything the build reads: the data, the page, its assets, the build
+# script and the locked esbuild version. Other files in src/ (CNAME,
+# .nojekyll) are copied through as they are, so committing them needs no
+# build.
+sources="data src/index.html src/assets build.mjs package-lock.json"
+
+# `git commit <path>` runs this hook against a temporary index: docs/ would be
+# staged there, while the real index kept the old docs/ for the next commit.
+case "$GIT_INDEX_FILE" in
+  *next-index*)
+    echo "pre-commit: commit with paths is not supported here;" >&2
+    echo "stage the files, then run git commit without paths." >&2
+    exit 1
+    ;;
+esac
+
+# Deletions count too: a removed asset changes the build.
+# shellcheck disable=SC2086 # $sources is a list of pathspecs, split on purpose
+staged=$(git diff --cached --name-only --diff-filter=ACMRD -- $sources)
+[ -z "$staged" ] && exit 0
+
+# The build reads the working tree, so it must match what is committed:
+# no unstaged changes, and no untracked files it would pick up.
+# shellcheck disable=SC2086
+if [ -n "$(git diff --name-only -- $sources)" ] ||
+  [ -n "$(git ls-files --others --exclude-standard -- $sources)" ]; then
+  echo "pre-commit: the build sources have unstaged changes or untracked" >&2
+  echo "files; stage them (or stash them) so the build matches the commit." >&2
+  exit 1
+fi
+
+# Check first, so a failed check leaves no stamped date behind.
+npm run --silent check
+
+for file in data/record.json data/matrix.json; do
+  if echo "$staged" | grep -qx "$file"; then
+    # The script is JavaScript: ${today} is a template literal for node, not
+    # a shell expansion, so the single quotes are intended. The pattern is
+    # anchored to the top-level key (two-space indent).
+    # shellcheck disable=SC2016
+    node -e '
+      const fs = require("fs")
+      const file = process.argv[1]
+      const text = fs.readFileSync(file, "utf8")
+      const today = new Date().toLocaleDateString("sv-SE")
+      const next = text.replace(/^  "updated": "[^"]*"/m, `  "updated": "${today}"`)
+      if (next !== text) {
+        fs.writeFileSync(file, next)
+      }
+    ' "$file"
+    git add "$file"
+  fi
+done
+
+npm run --silent build
+git add -A docs
