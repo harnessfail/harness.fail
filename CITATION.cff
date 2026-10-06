@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: 'If you use this data, please cite it as below.'
+type: dataset
+title: 'harness.fail: security issues AI agent harnesses failed to prevent'
+abstract: 'A record of security issues that AI agent harnesses failed to prevent, sorted into seven classes by the boundary that failed.'
+url: 'https://harness.fail'
+repository-code: 'https://github.com/harnessfail/harness.fail'
+license: CC-BY-4.0
+version: '2026-10-06'
+date-released: 2026-10-06
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23199129
+    description: 'Concept DOI for all versions of the record'
+authors:
+  - family-names: Seprűs
+    given-names: Péter
+    orcid: 'https://orcid.org/0009-0008-5499-6807'
+preferred-citation:
+  type: data
+  title: 'harness.fail: security issues AI agent harnesses failed to prevent'
+  authors:
+    - family-names: Seprűs
+      given-names: Péter
+      orcid: 'https://orcid.org/0009-0008-5499-6807'
+  year: 2026
+  url: 'https://harness.fail'
+  doi: 10.5281/zenodo.23199129
+keywords:
+  - agent harness
+  - AI agents
+  - AI security
+  - scaffolding collapse
+  - ambient activation
+  - prompt injection
