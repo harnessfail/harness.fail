@@ -27,7 +27,7 @@ Both JSON files are licensed like the page, so they can be reused with attributi
 
 ## Contributing
 
-Open a pull request to add an issue or dispute a matrix score. Issues go in `data/record.json`; scores and notes in `data/matrix.json`. The site in `docs/` is generated from these files, so leave it out of the pull request.
+Open a pull request to add an issue or dispute a matrix score. Issues go in `data/record.json`; scores and notes in `data/matrix.json`. The site in `docs/` is generated from these files; never edit it by hand. [CONTRIBUTING.md](CONTRIBUTING.md) has the row format, the fix statuses and how to run the checks.
 
 An issue needs a source, the affected harness, the date it was first disclosed, and one factual sentence on what failed. If it was fixed, name the version that fixed it. Primary sources are preferred: an advisory, a CVE record, a vendor announcement, or the researcher's own write-up. Press coverage is fine when no first-hand account is public.
 
