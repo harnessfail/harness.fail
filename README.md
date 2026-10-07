@@ -15,7 +15,7 @@ A record of security issues that AI agent harnesses failed to prevent.
 - **The matrix:** the capabilities a harness needs to enforce a file-access policy, written as abstract requirements, with each harness scored against them from its own documentation, source code, issue tracker and security advisories.
 - **Landscape shifts:** directional changes in agent harnesses, and in the operating systems they run on, that move where file-access policy lives, who decides, or which way it fails.
 
-Scaffolding collapse and Ambient activation are named on this site: they have no counterpart in OWASP or MITRE ATLAS. The other names come from the literature, credited on the page.
+Scaffolding collapse and Ambient activation are named on this site: they have no direct counterpart in OWASP or MITRE ATLAS. The other names come from the literature, credited on the page.
 
 ## Published
 
