@@ -24,7 +24,8 @@ const setupTheme = () => {
     const next = opposite()
     root.setAttribute('data-theme', next)
     try {
-      localStorage.setItem('theme', next)
+      // THEME_STORAGE_KEY is defined by build.mjs
+      localStorage.setItem(THEME_STORAGE_KEY, next)
     } catch {
       // storage blocked: the choice lasts for this page view only
     }

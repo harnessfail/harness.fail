@@ -85,7 +85,7 @@ const VISIBLE = 7
 
 const MARKS = {
   y: ['●', 'yes, documented'],
-  p: ['◐', 'partial'],
+  p: ['◐', 'partial, or documented gaps'],
   n: ['○', 'no'],
   u: ['?', 'undocumented'],
   na: ['—', 'not applicable'],
@@ -627,6 +627,21 @@ const matrixMeta = metaLine(
   link('matrix.json', 'JSON'),
 )
 
+// The legend lists the scores, then, on a line of their own, the marks that
+// are not scores.
+const UNSCORED_MARKS = new Set(['u', 'na'])
+const legendItem = ([key, [glyph, label]]) =>
+  `  <span><span class="s ${key}">${glyph}</span> ${label}</span>`
+const matrixLegend = [
+  ...Object.entries(MARKS)
+    .filter(([key]) => !UNSCORED_MARKS.has(key))
+    .map(legendItem),
+  '  <span class="break" aria-hidden="true"></span>',
+  ...Object.entries(MARKS)
+    .filter(([key]) => UNSCORED_MARKS.has(key))
+    .map(legendItem),
+].join('\n')
+
 // Built once per mark kind, then reused for every cell.
 const markHtml = Object.fromEntries(
   Object.entries(MARKS).map(([key, [glyph, label]]) => [
@@ -724,17 +739,70 @@ const structureUpdated = () => {
 }
 
 // ---- page -------------------------------------------------------------------
-// Each <!-- build:name --> placeholder in src/index.html takes one block.
+// Each <!-- build:name --> placeholder in src/index.html takes one block,
+// wherever it appears.
 const fill = (html, [name, content]) => {
   const marker = `<!-- build:${name} -->`
   if (!html.includes(marker)) {
     throw new Error(`src/index.html: missing ${marker}`)
   }
-  return html.replace(marker, () => content)
+  return html.replaceAll(marker, () => content)
 }
+
+const REPOSITORY = 'https://github.com/harnessfail/harness.fail'
+// The localStorage key for the chosen theme, read by the head script and
+// written by site.js (passed to esbuild as a define below).
+const THEME_STORAGE_KEY = 'theme'
+const NUMBER_WORDS = [
+  'zero',
+  'one',
+  'two',
+  'three',
+  'four',
+  'five',
+  'six',
+  'seven',
+  'eight',
+  'nine',
+  'ten',
+  'eleven',
+  'twelve',
+]
+const classCount = NUMBER_WORDS[record.classes.length]
+if (!classCount) {
+  throw new Error(`no word for ${record.classes.length} classes`)
+}
+
+// The browser bar takes the page background: the light and dark --paper from
+// the stylesheet, so the colours are defined only there.
+const STYLESHEET = readFileSync('src/assets/style.css', 'utf8')
+const paper = selector => {
+  const block = STYLESHEET.split(`${selector} {`)[1]?.split('}')[0]
+  const color = block?.match(/--paper:\s*([^;]+);/)?.[1].trim()
+  if (!color) {
+    throw new Error(`src/assets/style.css: no --paper in ${selector}`)
+  }
+  return color
+}
+const themeColor = [
+  ['light', paper(':root')],
+  ['dark', paper(':root[data-theme="dark"]')],
+]
+  .map(
+    ([scheme, color]) =>
+      `<meta name="theme-color" content="${color}" media="(prefers-color-scheme: ${scheme})">`,
+  )
+  .join('\n')
 
 const renderPage = () =>
   Object.entries({
+    'description': escape(record.description),
+    'homepage': escape(record.homepage),
+    'repository': REPOSITORY,
+    'theme-color': themeColor,
+    'theme-key': THEME_STORAGE_KEY,
+    'class-count': classCount,
+    'matrix-legend': matrixLegend,
     'record-toc': recordToc,
     'record-meta': recordMeta,
     'record': record.classes.map(recordClass).join('\n'),
@@ -775,6 +843,7 @@ await build({
   outdir: OUT,
   minify: true,
   target: ['es2020'],
+  define: { THEME_STORAGE_KEY: JSON.stringify(THEME_STORAGE_KEY) },
   logLevel: 'warning',
 })
 
