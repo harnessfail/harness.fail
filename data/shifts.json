@@ -4,7 +4,7 @@
       "date": "2026-10-02",
       "title": "Apple macOS",
       "url": "https://developer.apple.com/news/?id=p6zjojqw",
-      "text": "The OS tightens its broadest file-access grant: granting Full Disk Access will require \"very explicit user action\". Apple's stated reason is developers using it \"in ways that could put users at risk\", with AI agents named as a growing risk: \"As AI agents become increasingly capable and autonomous, the risks associated with this level of access will grow substantially.\""
+      "text": "The OS will tighten its broadest file-access grant: Apple announced it will add controls so that granting Full Disk Access takes \"very explicit user action\", with no date given. Apple's stated reason is developers using it \"in ways that could put users at risk\", with AI agents named as a growing risk: \"As AI agents become increasingly capable and autonomous, the risks associated with this level of access will grow substantially.\""
     },
     {
       "date": "2026-09-29",
@@ -16,7 +16,7 @@
       "date": "2026-09-29",
       "title": "Claude Code 2.1.285",
       "url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21285",
-      "text": "Denials hold against lower layers: project settings can no longer \"reopen managed read-denies\"."
+      "text": "Denials hold against lower layers: project settings can no longer \"reopen managed read-denies\" in the sandbox."
     },
     {
       "date": "2026-09-28",
