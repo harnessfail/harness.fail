@@ -317,6 +317,9 @@ const validateMatrix = ({ updated, groups, harnesses, findings, history }) => {
     if (!harness.name) {
       fail(harness.id, 'needs a name')
     }
+    if (typeof harness.version !== 'string' || !harness.version) {
+      fail(harness.id, 'needs the version current at scoring')
+    }
     if (!harness.note) {
       fail(harness.id, 'needs a note')
     }
@@ -338,6 +341,22 @@ const validateMatrix = ({ updated, groups, harnesses, findings, history }) => {
       fail('history', 'entries need a YYYY-MM-DD date and text')
     }
     checkText('history', entry.text)
+    // Optional: the marks the entry changed, each a known harness and
+    // requirement with a from and to mark.
+    for (const change of entry.changes ?? []) {
+      if (
+        !harnessIds.has(change.harness) ||
+        !requirementIds.has(change.requirement) ||
+        !Object.hasOwn(MARKS, change.from ?? '') ||
+        !Object.hasOwn(MARKS, change.to ?? '') ||
+        change.from === change.to
+      ) {
+        fail(
+          `history ${entry.date}`,
+          'changes need a known harness and requirement, and two different marks',
+        )
+      }
+    }
   }
   return errors
 }
@@ -691,14 +710,47 @@ const matrixGroup = group => {
 const matrixNotes = matrix.harnesses
   .map(
     harness =>
-      `${heading('h4', harness.id, escape(harness.name))}\n<p>${inline(harness.note)}</p>`,
+      `<h4 id="${harness.id}"><a class="self" href="#${harness.id}">${escape(harness.name)}</a>` +
+      ` <span class="version">${escape(harness.version)}</span></h4>\n<p>${inline(harness.note)}</p>`,
   )
   .join('\n\n')
+
+const markChanges = changes => {
+  if (!changes?.length) {
+    return ''
+  }
+  const byHarness = Map.groupBy(changes, change => change.harness)
+  const lines = matrix.harnesses
+    .filter(harness => byHarness.has(harness.id))
+    .map(harness => {
+      const items = byHarness
+        .get(harness.id)
+        .map(
+          change =>
+            `${change.requirement} ${markHtml[change.from]} <span aria-hidden="true">→</span>` +
+            `<span class="vh">changed to</span> ${markHtml[change.to]}`,
+        )
+        .join(', ')
+      return `<li><a href="#${harness.id}">${escape(harness.name)}</a>: ${items}</li>`
+    })
+  return [
+    '<details class="changes">',
+    `<summary><span class="closed">Show ${plural(changes.length, 'score change')}</span>` +
+      '<span class="open">Hide score changes</span></summary>',
+    '<ul>',
+    ...lines,
+    '</ul>',
+    '</details>',
+  ].join('\n')
+}
 
 const matrixHistory = matrix.history
   .map(entry => {
     const label = entry.label ? ` (${escape(entry.label)})` : ''
-    return `<p><strong>${longDate(entry.date)}${label}</strong> — ${inline(entry.text)}</p>`
+    return (
+      `<p><strong>${longDate(entry.date)}${label}</strong> — ${inline(entry.text)}</p>` +
+      markChanges(entry.changes)
+    )
   })
   .join('\n\n')
 

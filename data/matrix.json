@@ -8,7 +8,7 @@
   },
   "homepage": "https://harness.fail/#matrix",
   "license": "CC-BY-4.0",
-  "updated": "2026-10-06",
+  "updated": "2026-10-08",
   "groups": [
     {
       "id": "A",
@@ -243,6 +243,7 @@
     {
       "id": "aider",
       "name": "Aider",
+      "version": "0.86.2",
       "marks": {
         "A1": "y",
         "A2": "p",
@@ -250,23 +251,24 @@
         "A4": "n",
         "A5": "p",
         "B1": "p",
-        "B2": "u",
-        "B3": "u",
-        "B4": "u",
+        "B2": "n",
+        "B3": "n",
+        "B4": "p",
         "C1": "u",
         "C2": "u",
         "C3": "u",
         "C4": "u",
-        "D1": "u",
+        "D1": "y",
         "D2": "u",
         "D3": "u",
         "D4": "u"
       },
-      "note": "`.aiderignore`, `/read-only`, `--add-gitignore-files` — long-standing, gitignore syntax ([FAQ](https://aider.chat/docs/faq.html), [options](https://aider.chat/docs/config/options.html), [commands](https://aider.chat/docs/usage/commands.html)) (A1/A3 ●, A5 ◐); the ignore file is one per repository, \"default: .aiderignore in git root\" (A2 ◐). Aider's workflow is explicit-add — files enter context when the user adds them — which gates context by construction but is a workflow property, not an enforcement claim (B1 ◐). Enforcement locus and shell coverage undocumented."
+      "note": "`.aiderignore`, `/read-only`, `--add-gitignore-files` — long-standing, gitignore syntax ([FAQ](https://aider.chat/docs/faq.html), [options](https://aider.chat/docs/config/options.html), [commands](https://aider.chat/docs/usage/commands.html)) (A1/A3 ●, A5 ◐); the ignore file is aider's own and cannot name other tools (A4 ○), one per repository, \"default: .aiderignore in git root\" (A2 ◐). The FAQ describes it as a way to \"ignore parts of the repo that aren’t relevant to your task\"; enforcement is visible only in source. Matching is deterministic code — `pathspec` in [`repo.py`](https://github.com/Aider-AI/aider/blob/v0.86.2/aider/repo.py#L500-L521) (D1 ●) — and the tracked-file list that feeds the [repo map](https://aider.chat/docs/repomap.html) (\"a list of the files in the repo, along with the key symbols\") drops ignored files ([`repo.py#L486`](https://github.com/Aider-AI/aider/blob/v0.86.2/aider/repo.py#L486)); `/add` skips them \"due to aiderignore or --subtree-only\" ([`commands.py#L811-L812`](https://github.com/Aider-AI/aider/blob/v0.86.2/aider/commands.py#L811-L812)), but [`/read-only`](https://github.com/Aider-AI/aider/blob/v0.86.2/aider/commands.py#L1310) never consults it (B1 ◐). The edit path checks gitignore but not `.aiderignore`, and asks \"Allow edits to file that has not been added to the chat?\" instead ([`allowed_to_edit`](https://github.com/Aider-AI/aider/blob/v0.86.2/aider/coders/base_coder.py#L2191-L2204)) (B3 ○); model-suggested shell commands run after a \"Run shell command?\" confirmation with no ignore check ([`base_coder.py#L2434-L2455`](https://github.com/Aider-AI/aider/blob/v0.86.2/aider/coders/base_coder.py#L2434-L2455)) (B2 ○). The file is checked when a file is added and re-read when its mtime changes, at most once per second; files already in the chat are not re-checked (B4 ◐). Deny precedence, error handling, self-protection, policy-in-context, canonicalization, override and delegation are undocumented (?)."
     },
     {
       "id": "claude-code",
       "name": "Claude Code",
+      "version": "2.1.295",
       "marks": {
         "A1": "y",
         "A2": "p",
@@ -275,8 +277,8 @@
         "A5": "n",
         "B1": "p",
         "B2": "p",
-        "B3": "y",
-        "B4": "y",
+        "B3": "p",
+        "B4": "p",
         "C1": "y",
         "C2": "p",
         "C3": "p",
@@ -286,35 +288,37 @@
         "D3": "p",
         "D4": "p"
       },
-      "note": "`permissions.deny` with `Read()`/`Edit()` path rules ([permissions docs](https://code.claude.com/docs/en/permissions)) (A1/A3 ●); project settings can be committed with the repo (`.claude/settings.json`), but Claude Code reads that one file \"from the session's primary working directory\" ([settings](https://code.claude.com/docs/en/settings)), with no per-directory files (A2 ◐). Vendor states enforcement is deterministic: \"Permission rules are enforced by Claude Code, not by the model\" (D1 ●), with documented precedence \"deny, then ask, then allow\". A `Read` deny also blocks Edit and Write on the same path (B3 ●), evaluated before the tool call executes, and edits to `permissions` reach \"the running session without a restart\" (B4 ●) — but for context surfaces (Grep, Glob, `@`-mentions) the vendor's own wording is a \"best-effort attempt\", and NotebookEdit isn't covered (B1 ◐). Shell coverage is explicitly partial: recognized file commands only, rules \"don't apply … to arbitrary subprocesses\"; the opt-in [OS sandbox](https://code.claude.com/docs/en/sandboxing) closes that, with a default-enabled but prompt-gated unsandboxed-retry escape hatch (B2 ◐). Invalid managed sandbox values fail closed per the [changelog](https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md) (2.1.283), and an unparseable managed settings file stops every session; one the OS denies reading starts the session without its policies (2.1.285), and malformed `mcp__` parameter rules are skipped with a warning (C2 ◐). Scoped rules \"don't change which tools Claude sees. Claude Code checks them when Claude attempts a call, leaving the prefix intact\", and a bare tool-name deny removes the tool rather than describing it ([prompt caching](https://code.claude.com/docs/en/prompt-caching#denying-an-entire-tool)) (C4 ●). [CVE-2025-54794](https://github.com/anthropics/claude-code/security/advisories/GHSA-pmw4-pwvc-3hx2) was a prefix-matching-instead-of-canonicalization bug, fixed; the permissions docs now check both the requested path and the file a symlink resolves to, and symlink bypasses of `Read` deny rules through @-mentions and IDE selections were fixed in 2.1.289–2.1.290 (D2 ◐). [Permission modes](https://code.claude.com/docs/en/permission-modes) state that \"Deny rules block in every mode, including bypassPermissions\" — the blanket bypass lifts prompts, not deny rules (C1 ●) — and writes to protected paths, `.claude` settings among them, cannot be pre-approved by allow rules, yet in auto mode (the default starting mode since 2.1.284) a model classifier decides them, and bypassPermissions allows them outright (C3 ◐). That protected-path restriction is the D3 gap: user deny rules lift only when the user edits them, but the built-in restriction falls to a blanket mode and, in auto mode, to a classifier model's judgment (D3 ◐). Subagent docs cover the delegation interplay partially — a subagent cannot self-declare bypassPermissions, and background subagents surface permission prompts to the main session — and state that built-in subagents inherit the parent conversation's permission rules, with no such statement for custom ones (D4 ◐)."
+      "note": "`permissions.deny` with `Read()`/`Edit()` path rules ([permissions docs](https://code.claude.com/docs/en/permissions)) (A1/A3 ●); rules are Claude Code's own JSON settings and bind no other tool (A4 ○, A5 ○); project settings can be committed with the repo (`.claude/settings.json`), but Claude Code reads that one file \"from the session's primary working directory\" ([settings](https://code.claude.com/docs/en/settings)), with no per-directory files (A2 ◐). Vendor states enforcement is deterministic: \"Permission rules are enforced by Claude Code, not by the model\" (D1 ●), with documented precedence \"deny, then ask, then allow\". A `Read` deny also blocks Edit and Write on the same path, and Claude Code \"refuses the call before any file access\" ([errors](https://code.claude.com/docs/en/errors#file-is-covered-by-a-read-deny-rule)); NotebookEdit needs an `Edit` deny; rename and delete happen only through the shell, where deny rules reach \"file commands Claude Code recognizes in Bash, such as `cat`, `head`, `tail`, `sed`, and `tee`\" and redirection targets, with no statement for `mv` or `rm` (B3 ◐). Settings edits, `permissions` included, reach \"the running session without a restart\", but managed settings delivered by MDM or the claude.ai console \"reach a running session on a schedule rather than on save\" (B4 ◐). For context surfaces (Grep, Glob, `@`-mentions, IDE context) the vendor's own wording is a \"best-effort attempt\" (B1 ◐). Shell coverage is explicitly partial: rules \"don't apply … to arbitrary subprocesses that read or write files indirectly\"; the [OS sandbox](https://code.claude.com/docs/en/sandboxing), which \"is off by default\", closes that, with an unsandboxed-retry escape hatch (`allowUnsandboxedCommands`, default `true`) approved by a prompt, by the auto-mode classifier, or by a matching allow rule, depending on mode (B2 ◐). Invalid managed sandbox values fail closed per the [changelog](https://github.com/anthropics/claude-code/blob/v2.1.295/CHANGELOG.md) (2.1.283), and an unparseable managed settings file stops every session; one the OS denies reading starts the session \"without that file's policies\" (2.1.285); in other settings files a malformed permission rule is skipped — Claude Code \"skips those values and keeps the rest of the file in effect\" ([settings](https://code.claude.com/docs/en/settings)) (C2 ◐). Scoped rules \"don't change which tools Claude sees. Claude Code checks them when Claude attempts a call, leaving the prefix intact\", and a bare tool-name deny removes the tool rather than describing it ([prompt caching](https://code.claude.com/docs/en/prompt-caching#denying-an-entire-tool)) (C4 ●). [CVE-2025-54794](https://github.com/anthropics/claude-code/security/advisories/GHSA-pmw4-pwvc-3hx2) was \"prefix matching instead of canonical path comparison\", fixed; deny rules now \"apply when either the requested path or the file it resolves to matches\", yet symlink bypasses of `Read` deny rules through @-mentions, IDE selections and @-mentioned folder listings were still being fixed in 2.1.289–2.1.290 (D2 ◐). [Permission modes](https://code.claude.com/docs/en/permission-modes) state that \"Deny rules block in every mode, including `bypassPermissions`\", and \"PreToolUse hook decisions don't bypass permission rules\" (C1 ●). Writes to protected paths, `.claude` among them, cannot be pre-approved by allow rules, yet in auto mode — \"the built-in starting permission mode for interactive terminal and VS Code sessions\" — they are \"Routed to the classifier\", and in `bypassPermissions` they are \"Allowed\" (C3 ◐). That is also the D3 gap: user deny rules lift only when the user edits them, but the built-in protection falls to a blanket mode, to a classifier model's judgment, and to a prompt option that allows `.claude` edits \"for this session\" (D3 ◐). [Subagents](https://code.claude.com/docs/en/sub-agents): built-in ones inherit \"the parent conversation's permission rules\", a settings deny rule \"applies to the main conversation and to subagents\", and a subagent that declares `bypassPermissions` \"keeps the main conversation's mode instead\"; spawned shell processes carry the rules only inside the opt-in sandbox (D4 ◐)."
     },
     {
       "id": "cline",
       "name": "Cline",
+      "version": "4.1.23",
       "marks": {
         "A1": "y",
         "A2": "p",
         "A3": "y",
         "A4": "n",
         "A5": "p",
-        "B1": "n",
-        "B2": "n",
-        "B3": "u",
-        "B4": "u",
-        "C1": "u",
+        "B1": "p",
+        "B2": "p",
+        "B3": "p",
+        "B4": "p",
+        "C1": "n",
         "C2": "u",
-        "C3": "u",
+        "C3": "p",
         "C4": "u",
         "D1": "p",
-        "D2": "u",
-        "D3": "u",
+        "D2": "p",
+        "D3": "n",
         "D4": "u"
       },
-      "note": "`.clineignore`, gitignore syntax, one file \"in your project root\" (A1/A3 ●, A2 ◐, A5 ◐) — and the [docs](https://docs.cline.bot/customization/clineignore) state plainly that it \"is not a security or access-control boundary — ignored files can still be read via explicit @ mentions or shell commands\": it controls automatic loading, not access (B1 ○, B2 ○). The page carries a deprecation banner and offers a PreToolUse hook script as the enforced replacement, which \"actively blocks the tool call\" when a read, edit, or shell command targets an ignored file: opt-in, user-installed code that does not resolve symlinks and is disabled in `--yolo` mode (D1 ◐). Writes and the rest of groups C–D are undocumented (?)."
+      "note": "`.clineignore`, gitignore syntax, one file \"in your project root\" — multi-root workspaces get one per workspace root, not per directory (A1/A3 ●, A2 ◐, A5 ◐); it cannot name other tools (A4 ○). Matching files are excluded from \"the file listing Cline sees when starting a task\", automatic context gathering and search results, but the [docs](https://docs.cline.bot/customization/clineignore) state plainly that the file \"is not a security or access-control boundary — ignored files can still be read via explicit `@` mentions or shell commands\" (B1 ◐). The page carries a deprecation banner and offers a [PreToolUse hook script](https://github.com/cline/cline/blob/v4.1.23/sdk/examples/hooks/PreToolUse_ClineignoreGuard.sh) as the enforced replacement: opt-in, user-installed code that \"actively blocks the tool call whenever a file read (`read_files`), edit (`editor`, `apply_patch`), or shell command (`run_commands`) targets a file matching a `.clineignore` pattern\", parsing `apply_patch` add, update, delete and move headers (D1 ◐, B3 ◐). The hook \"cancels the tool call before it runs — the file is never accessed\", and the script reads `.clineignore` afresh on every call (B4 ◐). Its shell guard \"is a conservative token check, not a full shell parser … a sufficiently creative command could still slip through\" (B2 ◐); it \"also blocks attempts to modify `.clineignore` itself so the agent cannot un-ignore files\", though the hook file itself is not on its list (C3 ◐); \"Paths are canonicalized lexically, but symlinks are not resolved\" (D2 ◐); and \"In the CLI, hooks are disabled in `--yolo` mode\", so a blanket mode lifts the restriction (C1 ○, D3 ○). [Subagents](https://docs.cline.bot/features/subagents) run with \"Cline's built-in tools for the current mode\", and \"Approval settings don't apply inside a subagent\"; whether hooks run for a subagent's tool calls is not stated (D4 ?). Error handling for a malformed or unreadable `.clineignore` and whether the policy reaches model context are undocumented (?)."
     },
     {
       "id": "cursor",
       "name": "Cursor",
+      "version": "3.24.9",
       "marks": {
         "A1": "y",
         "A2": "p",
@@ -326,19 +330,20 @@
         "B3": "u",
         "B4": "u",
         "C1": "u",
-        "C2": "p",
-        "C3": "u",
+        "C2": "u",
+        "C3": "p",
         "C4": "u",
         "D1": "p",
         "D2": "p",
         "D3": "u",
         "D4": "u"
       },
-      "note": "`.cursorignore`, gitignore syntax, one file \"in your root directory\", with an opt-in setting that searches parent directories, not subdirectories ([ignore docs](https://cursor.com/docs/reference/ignore-file)) (A1/A3 ●, A2 ◐, A5 ◐). The docs disclaim completeness — \"complete protection isn't guaranteed due to LLM unpredictability\" — and state plainly that agent terminal and MCP tools \"cannot block access\" to ignored code (B1 ◐, B2 ○). Whether the rules gate writes, and when rule changes take effect, is undocumented (B3/B4 ?). [CVE-2025-64110](https://nvd.nist.gov/vuln/detail/cve-2025-64110) was an ignore-file fail-open (a new `.cursorignore` invalidated existing protections), fixed in 2.0 (C2 ◐). [CVE-2026-50548](https://nvd.nist.gov/vuln/detail/CVE-2026-50548) and [CVE-2026-50549](https://nvd.nist.gov/vuln/detail/CVE-2026-50549) (Cato Networks) let the agent write files outside the workspace through a sandbox write-path override and a failed-canonicalization fallback through an in-workspace symlink; both fixed in Cursor 3.0 per the NVD records (D2 ◐). \"Cursor blocks access to files listed in `.cursorignore`\", under the same no-guarantee caveat (D1 ◐)."
+      "note": "`.cursorignore`, gitignore syntax, one file \"in your root directory\", with an opt-in setting that searches parent directories, not subdirectories ([ignore docs](https://cursor.com/docs/reference/ignore-file)) (A1/A3 ●, A2 ◐, A5 ◐); the file binds all of Cursor's surfaces alike — \"Agent, Tab, and Inline Edit\" — with no way to name a tool (A4 ○). The docs disclaim completeness — \"complete protection isn't guaranteed due to LLM unpredictability\" — and state plainly that \"the terminal and MCP server tools used by Agent cannot block access to code governed by .cursorignore\" (B1 ◐, B2 ○); the [IDE release notes](https://cursor.com/docs/release-notes/ide#sep-2-2026) record name leaks closed one surface at a time — \"autocomplete in the prompt no longer suggests files excluded by `.cursorignore`\", and directory listings now \"honor `.cursorignore` patterns from parent folders when listing a subfolder\" (B1 ◐). Whether the rules gate writes, and when rule changes take effect, is undocumented (B3/B4 ?). [CVE-2025-64110](https://github.com/cursor/cursor/security/advisories/GHSA-vhc2-fjv4-wqch): an agent could write a new `.cursorignore` that invalidated the existing ones; since 2.0, \"the agents ability to create and edit cursorignore files has been blocked in all cases\", and the terminal sandbox lists `.cursorignore` among paths \"always write-protected, regardless of your sandbox.json configuration\" ([sandbox.json reference](https://cursor.com/docs/reference/sandbox)) — but that list does not name the `.gitignore` files Cursor also honors, and Run Everything mode runs with no sandbox ([run modes](https://cursor.com/docs/agent/security/run-modes)) (C3 ◐). How malformed rules are handled is undocumented; for a file that fails to load, 3.22 has Cursor retry a failed startup `.cursorignore` scan \"instead of leaving agent context reads stuck for the rest of the session\" ([3.22 notes](https://cursor.com/docs/release-notes/ide#sep-24-2026)), without saying what reads see meanwhile (C2 ?). [CVE-2026-50548](https://nvd.nist.gov/vuln/detail/CVE-2026-50548) and [CVE-2026-50549](https://nvd.nist.gov/vuln/detail/CVE-2026-50549) (Cato AI Labs) let the agent write files outside the workspace through a sandbox write-path override and a failed-canonicalization fallback through an in-workspace symlink; both fixed in Cursor 3.0 per the NVD records (D2 ◐). \"Cursor blocks access to files listed in `.cursorignore`\", under the same no-guarantee caveat (D1 ◐). Whether the rules hold against Run Modes grants, whether they reach model context, how they are overridden, and whether they carry to subagents is undocumented (C1/C4/D3/D4 ?)."
     },
     {
       "id": "deepseek-harness",
       "name": "DeepSeek Harness",
+      "version": "0.2.1-alpha.1",
       "marks": {
         "A1": "n",
         "A2": "n",
@@ -348,28 +353,29 @@
         "B1": "u",
         "B2": "p",
         "B3": "p",
-        "B4": "u",
+        "B4": "y",
         "C1": "n",
-        "C2": "u",
+        "C2": "p",
         "C3": "p",
-        "C4": "u",
+        "C4": "p",
         "D1": "p",
         "D2": "p",
         "D3": "n",
         "D4": "p"
       },
-      "note": "A named per-session abstraction — executors run \"under the session file policy\" ([v0.1.6-alpha.1](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.6-alpha.1), carried into [v0.1.7-rc.1](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.7-rc.1)) — documented as one of three sandbox modes (`read-only`, `workspace-write`, `danger-full-access`) over a workspace root, with no path patterns ([sandbox docs](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/sandbox.md)) (A1/A2/A3 ○, B2/D4 ◐). An approved escalated retry \"is a new call with a wider policy\" (C1 ○), and `danger-full-access`, which \"bypasses confinement\", ships in the default preset table ([permission presets](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/permission-presets.md)) (D3 ○). Enforcement fixes track the classic classes: POSIX symlink/parent-directory combinations, Windows drive-relative paths ([v0.1.6-alpha.1](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.6-alpha.1)), cross-workspace deletion escapes ([v0.1.7-alpha.1](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.7-alpha.1)) (B3 ◐, D2 ◐). [CVE-2026-82533](https://nvd.nist.gov/vuln/detail/CVE-2026-82533) (OX Research): the sandboxed agent could reach the harness's own unauthenticated control interface and elevate its session to `danger-full-access` — the enforcement layer operable by the thing it governs; fixed August 27, 2026 in 0.1.2-alpha.1, whose [release notes](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.2-alpha.1) require a one-time token for network access to the web interface (C3 ◐: the bar exists now, its guarantee is undocumented). [SAFETY.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/SAFETY.md) states plainly that sandboxing, approval prompts, and permission controls \"do not guarantee isolation or prevent damage\" (D1 ◐)."
+      "note": "No path rules: the file-effect policy is one of three sandbox modes (`read-only`, `workspace-write`, `danger-full-access`) over a workspace root, and \"Normal tool calls derive `workspaceRoot` from the calling session's immutable cwd\" ([sandbox docs](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-alpha.1/docs/subsystems/sandbox.md)) (A1–A5 ○). One policy applies \"to every confined bash, filesystem, and terminal call\" ([sandbox-policy README](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-alpha.1/packages/sandbox/sandbox-policy/README.md)): subprocesses run under Seatbelt, bwrap/Landlock, or a Windows ACL runner whose \"hard-link, unconfined-read, and AppContainer-ACL boundaries are current partial cases\" (B2 ◐), and file-tool writes the mode fence refuses fail with `FS_SANDBOX_DENIED` ([filesystem docs](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-alpha.1/docs/subsystems/filesystem.md)) — a mode, not a per-path do-not-touch (B3 ◐). \"Tool layers call resolve for each execution\", and the effective mode is the session's last `sandbox/mode` event, so a switch applies from the next call (B4 ●). An approved escalated retry \"is a new call with a wider policy\" (C1 ○), and `danger-full-access`, which \"bypasses confinement\", ships in the default preset table ([permission presets](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-alpha.1/docs/subsystems/permission-presets.md)), where \"Session choices survive restart\" (D3 ○). The same presets doc has misconfiguration fail at plugin load — configured entries named `custom` or `auto` throw — and \"a missing projection key fails explicitly\", and the sandbox seam rules that \"Silent unconfined passthrough is never legal for a confined policy\"; that covers mode and executor configuration, not path rules, which don't exist (C2 ◐). \"Before each model request, the model receives the effective policy and workspace\": enforced in sandbox code, but also stated to the model (C4 ◐). In-process subagents \"retain the inherited sandbox override plus `approval: never`\"; the statement is scoped to in-process backends, not the external ACP, Codex, and Claude Code providers ([subagent docs](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-alpha.1/docs/subsystems/subagent.md)) (D4 ◐). Enforcement fixes track the classic classes: POSIX symlink/parent-directory combinations, Windows drive-relative paths ([v0.1.6-alpha.1](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.6-alpha.1), carried into [v0.1.7-rc.1](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.7-rc.1)), Windows sandbox deletions escaping the authorized directory and across workspaces ([v0.1.7-alpha.1](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.7-alpha.1)); \"Enforcing providers canonicalize the root where the files exist\" (D2 ◐). [CVE-2026-82533](https://nvd.nist.gov/vuln/detail/CVE-2026-82533) (OX Research): the sandboxed agent could reach the harness's own unauthenticated control interface and elevate its session to unconfined execution — the enforcement layer operable by the thing it governs; fixed August 27, 2026 in 0.1.2-alpha.1, whose [release notes](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.2-alpha.1) require a one-time token for network access to the web interface, and the [web-server docs](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-alpha.1/docs/subsystems/web-server.md) now have the shipped Connection plugin supply \"Host/Origin checks plus browser-session authentication for every Host API route and stream\" (C3 ◐: the bar exists now, its guarantee is undocumented). [SAFETY.md](https://github.com/deepseek-ai/deepseek-harness/blob/dsh-v0.2.1-alpha.1/SAFETY.md) states plainly that sandboxing, approval prompts, and permission controls \"do not guarantee isolation or prevent damage\" (D1 ◐). Whether reads and listings are kept out of model context is undocumented (B1 ?)."
     },
     {
       "id": "gemini-cli",
       "name": "Gemini CLI",
+      "version": "0.63.0",
       "marks": {
         "A1": "y",
         "A2": "p",
         "A3": "y",
         "A4": "n",
         "A5": "p",
-        "B1": "y",
+        "B1": "p",
         "B2": "p",
         "B3": "p",
         "B4": "p",
@@ -377,16 +383,17 @@
         "C2": "n",
         "C3": "n",
         "C4": "u",
-        "D1": "y",
+        "D1": "p",
         "D2": "p",
-        "D3": "u",
+        "D3": "n",
         "D4": "u"
       },
-      "note": "`.geminiignore` plus `.gitignore` reuse ([docs](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/gemini-ignore.md)) (A1/A3 ●, A5 ◐); `.geminiignore` is one file \"in the root of your project directory\" — nested `.gitignore` files are honored per directory ([source](https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/utils/gitIgnoreParser.ts)), but that is the version-control file, not the harness's policy file (A2 ◐). `read_file` enforces deterministically via `shouldIgnoreFile()` (B1/D1 ●) — and a feature request on the project's tracker names `cat` via `run_shell_command` as the workaround for reading ignored files ([#13775](https://github.com/google-gemini/gemini-cli/issues/13775)); only the opt-in tool sandbox, off by default, turns ignored paths into kernel-denied paths for shell commands ([source](https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/config/config.ts)) (B2 ◐). Changes require a restart to take effect, per the same docs (B4 ◐). Negation handling has shipped a bug that errs restrictive (`!` rules fail to un-ignore, [#5444](https://github.com/google-gemini/gemini-cli/issues/5444), closed by the stale bot without a fix), but the error paths fail open: the matcher library skips a pattern ending in an unescaped backslash without a warning ([node-ignore](https://github.com/kaelzhang/node-ignore/blob/7.0.0/index.js)), an unreadable `.geminiignore` loads as no rules ([source](https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/utils/ignoreFileParser.ts)), and the ignore check returns not-ignored on any exception ([source](https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/utils/gitIgnoreParser.ts)) (C2 ○). The write tools carry no ignore check at all — `write_file` and `edit` never consult the ignore service, verifiable in [source](https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/tools/write-file.ts); the opt-in sandbox denies only shell writes to ignored paths (B3 ◐). Nothing protects `.geminiignore` itself: \"If the workspace is writable, we allow editing .gitignore and .geminiignore by default\" ([sandbox source](https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/sandbox/linux/bwrapArgsBuilder.ts)) (C3 ○). `read_file` checks the ignore rules against both the requested path and its resolved real path ([source](https://github.com/google-gemini/gemini-cli/blob/main/packages/core/src/tools/read-file.ts)); other surfaces are undocumented (D2 ◐)."
+      "note": "`.geminiignore` ([docs](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/docs/cli/gemini-ignore.md)) plus `.gitignore` reuse ([source](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/utils/gitIgnoreParser.ts)) (A1/A3 ●, A5 ◐); `.geminiignore` is one file \"in the root of your project directory\" — nested `.gitignore` files are honored per directory ([source](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/utils/gitIgnoreParser.ts)), but that is the version-control file, not the harness's policy file (A2 ◐). The docs scope the file to \"tools that support this feature\" (B1 ◐). `read_file` enforces deterministically via `shouldIgnoreFile()`, but the listing and search tools let the model switch the check off: `glob`, `list_directory` and `read_many_files` take a model-set `respect_gemini_ignore` ([tool definitions](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/tools/definitions/model-family-sets/default-legacy.ts)), and grep's `no_ignore` drops the `.geminiignore` filter ([source](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/tools/ripGrep.ts)) (B1/D1 ◐; D3 ○: the restriction lifts with no user action) — and a feature request on the project's tracker, closed as not planned, names `cat` via `run_shell_command` as the workaround for reading ignored files ([#13775](https://github.com/google-gemini/gemini-cli/issues/13775)); only the opt-in tool sandbox, `security.toolSandboxing` with `default: false` ([settings schema](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/cli/src/config/settingsSchema.ts)), turns ignored paths into kernel-denied paths for shell commands ([source](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/config/config.ts)) (B2 ◐). \"To apply the changes, you must restart your Gemini CLI session\", per the same docs (B4 ◐). Negation handling has shipped a bug that errs restrictive (`!` rules fail to un-ignore, [#5444](https://github.com/google-gemini/gemini-cli/issues/5444), closed by the project's bot after a Stale label, with no linked fix), but the error paths fail open: the matcher library skips a pattern ending in an unescaped backslash without a warning ([node-ignore](https://github.com/kaelzhang/node-ignore/blob/7.0.0/index.js)), an unreadable `.geminiignore` loads as no rules — \"continue without it\" ([source](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/utils/ignoreFileParser.ts)) — and the ignore check returns not-ignored on any exception ([source](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/utils/gitIgnoreParser.ts)) (C2 ○). The write tools carry no ignore check at all — `write_file` and `replace` never consult the ignore service, verifiable in source ([write-file.ts](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/tools/write-file.ts), [edit.ts](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/tools/edit.ts)); with the opt-in sandbox on, \"individual tool executions (like `shell_exec` and `write_file`)\" run inside it ([sandbox docs](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/docs/cli/sandbox.md)), where ignored paths are masked (B3 ◐). Nothing protects `.geminiignore` itself: \"If the workspace is writable, we allow editing .gitignore and .geminiignore by default\" ([sandbox source](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/sandbox/linux/bwrapArgsBuilder.ts)) (C3 ○). `read_file` checks the ignore rules against both the requested path and its resolved real path ([source](https://github.com/google-gemini/gemini-cli/blob/v0.63.0/packages/core/src/tools/read-file.ts)); other surfaces are undocumented (D2 ◐). Whether the rules hold against approval modes, whether ignore patterns reach model context, and whether they carry to subagents is undocumented (C1/C4/D4 ?)."
     },
     {
       "id": "github-copilot-agent-surfaces",
       "name": "GitHub Copilot (agent surfaces)",
+      "version": "Copilot CLI 1.0.93, VS Code 1.141.0",
       "marks": {
         "A1": "y",
         "A2": "n",
@@ -398,19 +405,20 @@
         "B3": "p",
         "B4": "p",
         "C1": "p",
-        "C2": "u",
+        "C2": "p",
         "C3": "p",
         "C4": "u",
         "D1": "p",
         "D2": "p",
-        "D3": "u",
-        "D4": "u"
+        "D3": "p",
+        "D4": "p"
       },
-      "note": "[Content exclusion](https://docs.github.com/en/copilot/concepts/security-governance-and-network-settings/content-exclusion) exists and is deterministic for completions, chat, and review — and the docs exclude both agent surfaces by name: \"GitHub Copilot CLI and Agent mode in Copilot Chat in IDEs do not support content exclusion\" ([configuring exclusions](https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot)). The path rules that do reach an agent surface are Copilot CLI's own: `Read(...)`, `Edit(...)`, and `Write(...)` glob rules in enterprise managed settings, session `--deny-tool` patterns such as `read(.env)` and `write(PATH)`, and `deniedPaths` for sandboxed commands ([configuration reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference), [command reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference#tool-permission-patterns)) (A1/A3 ●); agent mode in IDEs documents no equivalent. None of them lives in the tree: the repository settings file `.github/copilot/settings.json` supports only a listed set of keys, permission rules not among them, and content exclusion is server-delivered (A2 ○). Coverage is CLI-only: `Read` rules gate file reads, `Edit`/`Write` rules also cover a recognized set of shell redirections and in-place `sed` edits, but when the target \"comes from a variable\" the path rules \"do not apply\" (B1/B2/B3 ◐); rules are checked per request, and managed settings re-apply hourly \"without restarting the session\" (B4 ◐). A `write(PATH)` match \"resolves symlinks and . / .. segments\", while content exclusion documents symlinks and remote filesystems as not covered, with up to 30-minute propagation delay (D2 ◐). The CLI's rules are enforced by the harness, but the restriction an organization declares through content exclusion is not enforced on either agent surface (D1 ◐). File-based managed settings are rejected when they are \"symlinks, not owned by root, or world-writable\"; the docs state no such guard for the user-level settings file (C3 ◐). [v1.0.88](https://github.com/github/copilot-cli/releases/tag/v1.0.88) closed a management-layer fail-open where ACP, AHP-host, and `--server` sessions \"previously ran with no managed MCP, permission, or plugin policy\". Copilot CLI's own deny rules hold against grants — \"Deny rules always take precedence over allow rules, even when `--allow-all` is set or a matching approval has been saved\" ([allowing tools](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/allowing-tools)) — while agent mode in IDEs documents no equivalent (C1 ◐)."
+      "note": "[Content exclusion](https://docs.github.com/en/copilot/concepts/security-governance-and-network-settings/content-exclusion) exists and is deterministic for completions, chat, and review. For the agent surfaces, GitHub's own pages disagree: the how-to still says \"GitHub Copilot CLI and Agent mode in Copilot Chat in IDEs do not support content exclusion\" ([configuring exclusions](https://docs.github.com/en/copilot/how-tos/configure-content-exclusion/exclude-content-from-copilot)), while the concepts page marks Copilot CLI as supported and states \"Content exclusion is currently not supported in Edit and Agent modes of Copilot Chat in Visual Studio Code and other editors.\" The CLI [changelog](https://github.com/github/copilot-cli/blob/v1.0.93/changelog.md) shows exclusion enforced there, shell commands included (v1.0.33, v1.0.64), and since v1.0.64 failing open: \"Access is allowed until rules can be fetched\" when the rules service is unreachable. Server-managed settings likewise \"fail open\" when no cached policy is available (v1.0.78), unless an administrator sets `forceRemoteSettingsRefresh`: then \"An unsuccessful refresh leaves the policy unconfirmed, so affected operations are restricted\" ([enterprise managed settings](https://docs.github.com/en/copilot/reference/enterprise-administrators/enterprise-managed-settings)), and an unrecognized `disableBypassPermissionsMode` value is enforced as \"disable\" \"as a fail-closed default\" (C2 ◐). The path rules that do reach an agent surface are Copilot CLI's own: `Read(...)`, `Edit(...)`, and `Write(...)` glob rules in enterprise managed settings, session `--deny-tool` patterns such as `read(.env)` and `write(PATH)` ([configuration reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference), [command reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference#tool-permission-patterns)), and sandbox denied paths, which \"take precedence over both kinds of grant\" ([local sandboxing](https://docs.github.com/en/copilot/concepts/agents/copilot-cli/understanding-local-sandboxing)) (A1/A3 ●). Agent mode in VS Code has narrower equivalents: `deniedPaths` in `chat.agent.sandbox.fileSystem.userConfiguredPaths` for terminal commands and their child processes, while \"Built-in tools that don't start operating system processes use their own permission checks\" ([agent sandboxing](https://code.visualstudio.com/docs/agents/run/agent-sandboxing)), and `chat.tools.edits.autoApprove` globs that require approval for edits to sensitive files ([sensitive files](https://code.visualstudio.com/docs/agents/run/review-code-edits#_edit-sensitive-files)). None of them lives in the tree: for the repository settings file `.github/copilot/settings.json`, \"Only the keys listed in the following table are supported at the repository level\", permission rules not among them; sandbox policy is per project in app settings; content exclusion is server-delivered; repository hooks (`.github/hooks/`) can deny tool calls, but as code, not declarative path rules (A2 ○). Coverage is CLI-only: `Read` rules gate file reads, `Edit`/`Write` rules also cover a recognized set of shell redirections and in-place `sed` edits, but when the path \"comes from a variable\" \"these path rules do not apply\"; shell commands and built-in searches \"run as sandboxed child processes, so the operating system enforces the policy directly\" (B1/B2/B3 ◐). Managed settings re-apply hourly \"without restarting the session\", content exclusion \"can take up to 30 minutes to take effect in IDEs\", and \"A running child process keeps the policy it received at launch\" (B4 ◐). A `write(PATH)` match \"resolves symlinks and . / .. segments\", sandbox denied paths resolve \"their written path and current target\" though on Linux \"a denied symbolic link protects its target, but does not reliably prevent the link itself from being replaced\", and \"content exclusions do not apply to symbolic links (symlinks) and repositories located on remote filesystems\" (D2 ◐). The CLI's rules are enforced by the harness, but the restriction an organization declares through content exclusion is not enforced in IDE agent mode (D1 ◐). File-based managed settings are rejected when they are \"symlinks, not owned by root, or world-writable\"; the docs state no such guard for the user-level settings file (C3 ◐). [v1.0.88](https://github.com/github/copilot-cli/releases/tag/v1.0.88) closed a management-layer fail-open where ACP, AHP-host, and `--server` sessions \"previously ran with no managed MCP, permission, or plugin policy\". Copilot CLI's own deny rules hold against grants: \"Deny rules always take precedence over allow rules, even when `--allow-all` is set or a matching approval has been saved\" ([allowing tools](https://docs.github.com/en/copilot/how-tos/copilot-cli/use-copilot-cli/allowing-tools)). Sandbox denials do not: in VS Code \"Approval to run outside the sandbox removes file system and network restrictions for that operation\" (C1 ◐). A CLI sandbox bypass \"applies to that attempt\", but \"A bypass prompt can also let you disable sandboxing for the rest of the current session\" ([sandbox settings](https://docs.github.com/en/copilot/how-tos/cloud-and-local-sandboxes/configuring-local-sandbox-settings)), and in VS Code \"If you approve a session-wide bypass, subsequent terminal commands in that session also run without those restrictions\" (D3 ◐). For subagents, \"Whether the policy applies, and how, depends on the tool a subagent invokes\" (D4 ◐). Whether rule text ever reaches the model is undocumented (C4 ?)."
     },
     {
       "id": "goose",
       "name": "goose",
+      "version": "1.54.0",
       "marks": {
         "A1": "n",
         "A2": "n",
@@ -422,30 +430,31 @@
         "B3": "u",
         "B4": "u",
         "C1": "p",
-        "C2": "u",
+        "C2": "n",
         "C3": "u",
-        "C4": "u",
+        "C4": "n",
         "D1": "p",
         "D2": "u",
-        "D3": "u",
+        "D3": "n",
         "D4": "u"
       },
-      "note": "`.gooseignore` is gone from the current tree: the docs carry no page for it, the string survives only in the repo's own `.gitignore`, and [v1.44.0](https://github.com/aaif-goose/goose/releases/tag/v1.44.0)'s \"Remove stale gooseignore references\" was the cleanup — current permissions are per-tool (allow / ask / deny), not per-path, so no declarative path-rule surface exists today (A1/A2/A3 ○). v1.49.0 shipped \"Give permission denies precedence\" ([#11477](https://github.com/aaif-goose/goose/pull/11477)), so a saved `never_allow` now beats an overlapping `always_allow` — but Auto mode approves every tool without consulting it ([permission inspector](https://github.com/aaif-goose/goose/blob/main/crates/goose/src/permission/permission_inspector.rs)) (C1 ◐), and hooks carry a documented deny contract ([v1.44.0](https://github.com/aaif-goose/goose/releases/tag/v1.44.0)), though a policy hook that fails lets the call through unless set to `on_failure: block` ([hooks docs](https://github.com/aaif-goose/goose/blob/104ddde585112af6f074f912f3ceb405fb5b800e/documentation/docs/guides/context-engineering/hooks.md)) (D1 ◐). What the per-tool permissions gate operationally is undocumented (B1–B4 ?)."
+      "note": "`.gooseignore` is gone from the current tree: the docs carry no page for it, the string survives in the repo's own [`.gitignore`](https://github.com/aaif-goose/goose/blob/v1.54.0/.gitignore), and [v1.44.0](https://github.com/aaif-goose/goose/releases/tag/v1.44.0)'s \"Remove stale gooseignore references\" ([#10203](https://github.com/aaif-goose/goose/pull/10203)) was the cleanup. Tool permissions are per tool, not per path: \"Each tool can be set to one of three permission levels\" (Always Allow, Ask Before, Never Allow) ([tool permissions](https://github.com/aaif-goose/goose/blob/v1.54.0/documentation/docs/guides/managing-tools/tool-permissions.md)) (A1–A5 ○). The only file-access policy a user can write is [adversary mode](https://github.com/aaif-goose/goose/blob/v1.54.0/documentation/docs/guides/security/adversary-mode.md)'s `~/.config/goose/adversary.md`, \"your policy, written in plain language\" (for example \"SSH keys, .env files, or credentials are read or transmitted\"), judged by a reviewer that \"uses the same model and provider goose is already configured with\": model judgment over prose, not a rule (C4 ○). By default it reviews only `shell` calls, and \"If the reviewer fails for any reason, the tool call is allowed through (fail-open)\". v1.49.0 shipped \"Give permission denies precedence\" ([#11477](https://github.com/aaif-goose/goose/pull/11477)), giving \"persisted hard-deny entries precedence over overlapping allow or prompt entries\". But Auto mode approves every tool without consulting them ([permission inspector](https://github.com/aaif-goose/goose/blob/v1.54.0/crates/goose/src/permission/permission_inspector.rs): `GooseMode::Auto => InspectionAction::Allow`) (C1 ◐), and \"`Autonomous Mode` is applied by default\" ([permission modes](https://github.com/aaif-goose/goose/blob/v1.54.0/documentation/docs/guides/managing-tools/goose-permissions.md)): a blanket mode that lifts every restriction (D3 ○). Subagents run only in that mode: \"Subagents are disabled in manual approval, smart approval, and chat-only modes\" ([subagents](https://github.com/aaif-goose/goose/blob/v1.54.0/documentation/docs/guides/context-engineering/subagents.mdx)). Hooks carry a documented deny contract ([v1.44.0](https://github.com/aaif-goose/goose/releases/tag/v1.44.0)), though \"By default a hook failure is logged and the tool call proceeds\" unless set to `on_failure: block` ([hooks docs](https://github.com/aaif-goose/goose/blob/v1.54.0/documentation/docs/guides/context-engineering/hooks.md)) (D1 ◐). A malformed hook configuration \"skips that plugin's `hooks.json` with a warning\", and `on_failure` \"does not make configuration-loading or matcher errors fail closed\" (C2 ○). Read, shell and write gating, timing, self-protection, canonicalization, and delegation of restrictions are undocumented (B1–B4, C3, D2, D4 ?)."
     },
     {
       "id": "jetbrains-ai-assistant-junie",
       "name": "JetBrains AI Assistant / Junie",
+      "version": "AI Assistant 263.6800.10, Junie 262.2144.120",
       "marks": {
         "A1": "y",
         "A2": "p",
         "A3": "y",
-        "A4": "p",
+        "A4": "n",
         "A5": "p",
         "B1": "p",
-        "B2": "n",
+        "B2": "p",
         "B3": "p",
         "B4": "u",
-        "C1": "u",
+        "C1": "n",
         "C2": "u",
         "C3": "u",
         "C4": "u",
@@ -454,15 +463,16 @@
         "D3": "n",
         "D4": "u"
       },
-      "note": "`.aiignore`, honoring `.cursorignore`/`.codeiumignore`/`.aiexclude` \"as long as they are located in the root folder of the project\" (A5 ◐), plus `.noai` \"in the root directory of the project\" as a whole-project kill switch (A1/A3 ●) — a vendor-specific marker, per-agent in the binary, single-vendor sense (A4 ◐) ([docs](https://www.jetbrains.com/help/ai-assistant/disable-ai-assistant.html)); the documented locations are the project root, not per directory (A2 ◐). Enforcement is vendor-admitted best-effort: \"ignored files may still be processed due to unforeseen issues\" ([docs](https://www.jetbrains.com/help/ai-assistant/disable-ai-assistant.html)), and file names and paths stay visible ([support KB](https://youtrack.jetbrains.com/articles/SUPPORT-A-3359)) (B1/D1 ◐). Allowlisted commands skip `.aiignore` checks entirely (B2 ○), and Brave Mode bypasses the approval prompts wholesale (D3 ○). Edits to ignored files are approval-gated rather than hard-blocked — Junie \"will ask for explicit approval before viewing or editing the contents\" (B3 ◐)."
+      "note": "`.aiignore` uses \"the same syntax as a .gitignore file\" (A1/A3 ●), and AI Assistant also honors `.cursorignore`, `.codeiumignore`, or `.aiexclude` \"as long as they are located in the root folder of the project\" (A5 ◐); `.noai` \"in the root directory of the project\" is a whole-project kill switch ([docs](https://www.jetbrains.com/help/ai-assistant/disable-ai-assistant.html)). Junie reads `.aiignore` \"in the project root directory\" ([Junie docs](https://junie.jetbrains.com/docs/junie-ide-plugin.html)), not per directory (A2 ◐). The file names no tool and binds only Junie: AI Assistant's [agents page](https://www.jetbrains.com/help/ai-assistant/agents.html) lists `.aiignore` as \"Respected\" for Junie and \"Not respected\" for Claude Agent, Codex, and GitHub Copilot, and \"files listed in .aiignore can be processed by Claude Agent\" ([Claude Agent](https://www.jetbrains.com/help/ai-assistant/claude-agent.html)) (A4 ○). Enforcement is vendor-admitted best-effort: \"ignored files may still be processed due to unforeseen issues\" ([docs](https://www.jetbrains.com/help/ai-assistant/disable-ai-assistant.html)), and \"Only the contents of files listed in .aiignore are protected\" ([Junie docs](https://junie.jetbrains.com/docs/junie-ide-plugin.html)); file names and paths stay visible ([support KB](https://youtrack.jetbrains.com/articles/SUPPORT-A-3359)) (B1/D1 ◐). Edits to ignored files are approval-gated rather than hard-blocked: Junie \"will ask for explicit approval before viewing or editing\" them ([Junie docs](https://junie.jetbrains.com/docs/junie-ide-plugin.html)) (B3 ◐). The Junie docs name two exceptions where Junie \"might still have access to the files listed in .aiignore\": \"If Brave Mode is turned on\", and \"When executing a command that is added to the Action Allowlist\". So a remembered allowlist entry and a bypass mode both lift the restriction: \"if a command is allowlisted, Junie will not ask for confirmation, even if that command accesses files and folders listed in `.aiignore`\" ([support KB](https://youtrack.jetbrains.com/articles/SUPPORT-A-3359)) (C1 ○). Other shell access stays approval-gated (B2 ◐), and Brave Mode lets Junie \"execute all potentially sensitive actions without user approval\" (D3 ○). These statements are from the IDE plugin; the Junie CLI docs do not mention `.aiignore`. Timing, fail direction, self-protection, policy-as-data, canonicalization, and delegation are undocumented (B4, C2, C3, C4, D2, D4 ?)."
     },
     {
       "id": "openai-codex-cli",
       "name": "OpenAI Codex CLI",
+      "version": "0.162.0",
       "marks": {
-        "A1": "p",
+        "A1": "y",
         "A2": "p",
-        "A3": "p",
+        "A3": "y",
         "A4": "n",
         "A5": "n",
         "B1": "p",
@@ -475,14 +485,15 @@
         "C4": "p",
         "D1": "y",
         "D2": "p",
-        "D3": "p",
-        "D4": "y"
+        "D3": "n",
+        "D4": "p"
       },
-      "note": "The long-standing read-restriction gap has begun closing: beta [permission profiles](https://learn.chatgpt.com/docs/permissions) add per-path filesystem rules — glob `deny` entries that deny \"both reads and writes\" — configurable in project `.codex/config.toml` files, which Codex loads \"from the project root to your current working directory\", closest wins, trusted projects only ([advanced config](https://learn.chatgpt.com/docs/config-file/config-advanced)): the files travel with the repo, but which ones apply depends on where the session starts, not on the path being accessed (A1/A2 ◐, A3 ◐, B1 ◐: beta, config-based, sandbox-enforced; the `.codexignore` request [#1397](https://github.com/openai/codex/issues/1397) was closed into #2847, itself closed completed June 2026 with this feature as the answer). The profile semantics lean fail-closed: deny takes precedence over write and write over read, and \"missing or empty filesystem tables keep filesystem access restricted\" with a startup warning (C2 ◐); the `:workspace` profile keeps the workspace `.codex` directory read-only by default (C3 ◐); the deny list is enforced in sandbox code, but the harness also writes its paths and globs into model context as a developer message ([source](https://github.com/openai/codex/blob/4d15794336668d6098c0e36eb8e96cbbbfdb1d2d/codex-rs/prompts/src/permissions_instructions.rs#L382-L396)) (C4 ◐). The enforcement substrate is an always-on OS sandbox (macOS Seatbelt, Linux bubblewrap; [docs](https://learn.chatgpt.com/docs/sandboxing), [independently investigated](https://simonwillison.net/2025/Nov/9/codex-sandbox-investigation/)) confining writes and network at kernel level, with spawned commands inheriting the same boundaries (B2/B3 ●, D1 ●, D4 ●); whether an edited profile reaches a running session without a restart is undocumented (B4 {?}). On Linux, literal deny paths are kept alongside their resolved targets so denials hold across writable symlinks ([#48155](https://github.com/openai/codex/pull/48155)) (D2 ◐). Approved escalations run unsandboxed and a `danger-full-access` mode exists (D3 ◐); approved commands \"retain explicit filesystem denials\" ([rust-v0.159.0](https://github.com/openai/codex/releases/tag/rust-v0.159.0)), but the `:danger-full-access` profile \"removes local sandbox restrictions\" ([permissions](https://learn.chatgpt.com/docs/permissions)) (C1 ◐)."
+      "note": "The long-standing read-restriction gap has begun closing: beta [permission profiles](https://learn.chatgpt.com/docs/permissions) (\"Beta. Permission profiles are under active development and may change.\") add per-path filesystem rules — a `deny` entry \"Denies both reads and writes under the path\", and glob `deny` entries are supported — configurable in project `.codex/config.toml` files: \"Codex walks from the project root to your current working directory and loads every .codex/config.toml it finds\", \"the closest file to your working directory wins\", and \"Codex loads project-scoped config files only when the project is trusted\" ([advanced config](https://learn.chatgpt.com/docs/config-file/config-advanced)). User-authorable per-path rules exist, in beta (A1/A3 ●); the files travel with the repo, but which ones apply depends on where the session starts, not on the path being accessed (A2 ◐). The `.codexignore` request [#1397](https://github.com/openai/codex/issues/1397) was closed as a duplicate; its successor [#2847](https://github.com/openai/codex/issues/2847) was closed as completed on 2026-06-29, a maintainer citing \"a new feature in beta that implements this functionality\". The format is a Codex-specific TOML profile (A5 ○), and a profile names no agent (A4 ○). A `read` grant means \"Commands cannot create, modify, rename, or delete files there\" (B3 ●). The profile semantics lean fail-closed: \"When two entries target the same path, `deny` takes precedence over `write`, and `write` takes precedence over `read`\", though \"A more specific path can also reopen a narrower subtree inside a broader deny\"; \"Missing or empty filesystem tables keep filesystem access restricted and emit a startup warning\", and \"If the selected policy cannot be enforced by the platform sandbox, Codex refuses to run the command instead of silently running it unsandboxed\" — but \"If `sandbox_mode` appears in any loaded config file … Codex uses those older sandbox settings instead of `default_permissions`\" (C2 ◐). Extending `:workspace` \"keeps the workspace root's `.codex` directory read-only unless you explicitly override it\" (C3 ◐). The deny list is enforced in sandbox code, but the harness also writes the denied paths and globs into model context as a developer message — \"The active permission profile denies reading these paths/globs\" ([source](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/prompts/src/permissions_instructions.rs#L382-L396)) — so the names of denied paths reach the model (C4 ◐, B1 ◐). The enforcement substrate is an OS sandbox (macOS Seatbelt, Linux bubblewrap): \"The sandbox applies to spawned commands, not just to built-in file operations\", and commands like git or test runners \"inherit the same sandbox boundaries\" ([sandboxing](https://learn.chatgpt.com/docs/sandboxing)) (B2/B3 ●, D1 ●); rust-v0.162.0 fixed a crack in that substrate, where a user ripgrep config could leave \"files matching deny globs unmasked\" ([#51527](https://github.com/openai/codex/pull/51527)). \"Subagents inherit your current sandbox policy\" ([subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents)), but \"Connectors, MCP servers, browser or computer-use surfaces, Codex cloud environment settings, and approved escalations use their own controls\" ([permissions](https://learn.chatgpt.com/docs/permissions)) (D4 ◐). Whether an edited profile reaches a running session without a restart is undocumented; on Linux, WSL and Windows, deny-read globs are expanded when \"Codex snapshots matches before sandbox startup\" (B4 ?). On Linux, an approved command will \"Preserve literal deny paths alongside resolved targets so Linux can reject denials that cross writable symlinks\" ([#48155](https://github.com/openai/codex/pull/48155)) (D2 ◐). Approved commands \"retain explicit filesystem denials\" ([rust-v0.159.0](https://github.com/openai/codex/releases/tag/rust-v0.159.0)), and \"Approved filesystem escalation can now grant broader write access while preserving denied reads\" ([rust-v0.161.0](https://github.com/openai/codex/releases/tag/rust-v0.161.0)), yet `:danger-full-access` \"removes local sandbox restrictions\" ([permissions](https://learn.chatgpt.com/docs/permissions)) (C1 ◐). That blanket mode is the only lift short of editing the rule: there is no one-invocation override, and the model is told \"Do not request escalation or additional permissions to read them\" (D3 ○)."
     },
     {
       "id": "pi",
       "name": "Pi",
+      "version": "1.1.0",
       "marks": {
         "A1": "n",
         "A2": "n",
@@ -497,23 +508,24 @@
         "C2": "na",
         "C3": "na",
         "C4": "na",
-        "D1": "p",
+        "D1": "na",
         "D2": "na",
         "D3": "na",
         "D4": "n"
       },
-      "note": "Ships no file-access rules: an issue on its tracker lists the only mechanisms as the coarse `--tools` flag, custom TypeScript hooks, and interactive confirmation ([#4459](https://github.com/earendil-works/pi/issues/4459), which proposed native allow/deny policy files — auto-closed during a refactor without review) (A1–B4 ○, C1–C4 and D2/D3 —). The [security doc](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md) places safety outside the harness — it \"comes from limiting the files, credentials, processes, and network services Pi can access\" — and spells out the consequence: the working folder \"does not prevent commands from accessing other paths available to the Pi process,\" project trust \"does not limit what tool calls can access,\" and child processes \"run with those same permissions\" (D4 ○). What Pi does have is a deterministic enforcement point: the `tool_call` hook can block operations in host-side code before execution, and the shipped [permission-gate example](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/examples/extensions/permission-gate.ts) blocks by default when no UI is present — a policy layer could attach there, but enforcement itself is user-written code, not a shipped feature (D1 ◐)."
+      "note": "Ships no file-access rules: an issue on its tracker lists the only mechanisms as the coarse `--tools` flag, custom TypeScript hooks, and interactive confirmation ([#4459](https://github.com/earendil-works/pi/issues/4459), which proposed native allow/deny policy files and was auto-closed during a refactor: \"Issues closed during this period will not be reviewed\") (A1–B4 ○, C1–C4 and D1–D3 —). The [security doc](https://github.com/earendil-works/pi/blob/v1.1.0/packages/coding-agent/docs/security.md) places safety outside the harness — \"Safety comes from limiting the files, credentials, processes, and network services Pi can access and affect\" — and spells out the consequence: the working folder \"does not prevent commands from accessing other paths available to the Pi process\", project trust \"does not limit what tool calls can access or affect\", and child processes \"run with those same permissions\" (D4 ○); it also counts \"lack of a built-in sandbox\" as expected behavior. What Pi does have is a deterministic enforcement point: the `tool_call` hook can block operations in host-side code before execution. The shipped [permission-gate example](https://github.com/earendil-works/pi/blob/v1.1.0/packages/coding-agent/examples/extensions/permission-gate.ts) blocks three pattern-matched bash commands (`rm -rf`, `sudo`, `chmod`/`chown 777`) when no UI is present, and a sibling [protected-paths example](https://github.com/earendil-works/pi/blob/v1.1.0/packages/coding-agent/examples/extensions/protected-paths.ts) blocks `write`/`edit` calls to a hard-coded list (`.env`, `.git/`, `node_modules/`). A policy layer could attach there, but these are opt-in examples: with no restriction shipped, there is nothing for the harness to enforce yet (D1 —)."
     },
     {
       "id": "windsurf-devin",
       "name": "Windsurf / Devin",
+      "version": "Devin Desktop 3.10.48, CLI 3000.11.3",
       "marks": {
         "A1": "y",
         "A2": "p",
         "A3": "y",
         "A4": "n",
         "A5": "p",
-        "B1": "y",
+        "B1": "p",
         "B2": "p",
         "B3": "y",
         "B4": "u",
@@ -523,21 +535,22 @@
         "C4": "u",
         "D1": "y",
         "D2": "p",
-        "D3": "u",
+        "D3": "p",
         "D4": "p"
       },
-      "note": "`.devinignore` (with legacy `.windsurfignore` / `.codeiumignore` \"still read and enforced alongside\" it), gitignore syntax, one file at \"the root of your repository\": paths matched \"are excluded from indexing and cannot be viewed, edited, or created by Devin\" ([docs](https://docs.devin.ai/desktop/context-awareness/devin-ignore)) (A1/A3 ●, A2 ◐, A5 ◐, B1/B3 ●). Since v3.9.19 removed Cascade ([changelog](https://docs.devin.ai/desktop/changelog)), [Devin Local](https://docs.devin.ai/desktop/devin-local) is the only agent in Devin Desktop, and it shares Devin CLI's [permission rules](https://docs.devin.ai/cli/reference/permissions.md), evaluated in a fixed order where \"A deny rule always wins\" (C1 ◐: only organization-level rules are guaranteed against Bypass mode). Smart mode's model judgment \"only applies where no rule already decides the call, so a `deny` rule blocks the action\" (D1 ●); the `.devinignore` docs do not name where that file is enforced. An opt-in [OS sandbox](https://docs.devin.ai/cli/sandbox.md) hides `Read(...)`-denied paths from shell commands (B2 ◐) and errs restrictive: unsupported exclusion rules are \"ignored with a warning\", and a sandbox that cannot be resolved refuses to start (C2 ◐). The write tools \"refuse to write through a symlink\" (v3.6.27), with reads unstated (D2 ◐), and [background subagents](https://docs.devin.ai/cli/subagents.md) get only tools already approved in the session (D4 ◐)."
+      "note": "`.devinignore` (with legacy `.windsurfignore` / `.codeiumignore` \"still read and enforced alongside `.devinignore`\"), gitignore syntax, one file at \"the root of your repository\": paths matched \"are excluded from indexing and cannot be viewed, edited, or created by Devin\" ([docs](https://docs.devin.ai/desktop/context-awareness/devin-ignore)) (A1/A3 ●, A2 ◐, A5 ◐, B3 ●); whether the names of ignored paths stay out of listings and context is not stated (B1 ◐). Since v3.9.19, \"Cascade has been removed\" and \"Devin Local is now the only agent available in Devin Desktop\" ([changelog](https://docs.devin.ai/desktop/changelog)); [Devin Local](https://docs.devin.ai/desktop/devin-local) shares Devin CLI's [permission rules](https://docs.devin.ai/cli/reference/permissions.md), where \"A deny rule always wins\", and v3.7.16 has rules \"from different levels (enterprise, mode, user, project, subagent) now compose predictably — an explicit `deny:` always wins\". But the precedence table still ranks \"Session-level grants (interactive approvals)\" above project and user config, and only \"Organization-level deny and ask rules cannot be overridden by project or user config\" (C1 ◐). The same holds for Bypass mode, where \"all tool calls are auto-approved without prompting\": only organization rules are guaranteed against it (D3 ◐). Smart mode's model judgment \"only applies where no rule already decides the call, so a `deny` rule blocks the action\" (D1 ●); the `.devinignore` docs do not name where that file is enforced. An opt-in [OS sandbox](https://docs.devin.ai/cli/sandbox.md) hides `Read(...)`-denied paths \"from sandboxed commands entirely\", \"hidden for the whole session\" (B2 ◐), and errs restrictive in places — non-`Exec` rules in `sandbox.excluded` are \"ignored with a warning\", and if sandbox resolution fails, the CLI \"will refuse to start rather than running unsandboxed\" — but not everywhere: on Linux, \"unsupported glob rules are ignored and logged\" (CLI v3000.4.16) (C2 ◐). The `edit`, `write`, `apply_patch`, and `notebook_edit` tools \"now refuse to write through a symlink\" (Desktop v3.6.27, CLI v3000.3.27), with reads unstated (D2 ◐), and [background subagents](https://docs.devin.ai/cli/subagents.md) \"inherit any tool permissions you have already granted during the current session\"; \"Any tool that has not been pre-approved is automatically denied\" (D4 ◐). Unstated: whether edits to rule files take effect mid-session (B4 ?), whether the agent is barred from editing `.devinignore` or `.devin/config.json` (C3 ?), and whether ignore patterns or rules enter model context (C4 ?)."
     },
     {
       "id": "zed",
       "name": "Zed",
+      "version": "1.23.2",
       "marks": {
         "A1": "y",
         "A2": "y",
         "A3": "y",
         "A4": "n",
         "A5": "n",
-        "B1": "y",
+        "B1": "p",
         "B2": "n",
         "B3": "y",
         "B4": "u",
@@ -547,14 +560,162 @@
         "C4": "u",
         "D1": "y",
         "D2": "p",
-        "D3": "u",
-        "D4": "u"
+        "D3": "p",
+        "D4": "p"
       },
-      "note": "`private_files` and `read_only_files` glob settings, project-resident ([configuration](https://zed.dev/docs/reference/all-settings), [tool permissions](https://zed.dev/docs/ai/tool-permissions)); project settings files can also sit in subdirectories ([configuring Zed](https://github.com/zed-industries/zed/blob/main/docs/src/configuring-zed.md)), and the agent's file tools look the settings up for the path being accessed ([source](https://github.com/zed-industries/zed/blob/main/crates/agent/src/tools/read_file_tool.rs)) (A1/A2/A3 ●, B1/B3 ●). v1.21.0 added `\"...\"` inheritance-extension semantics for `read_only_files`, and v1.22.0 spread them to more glob settings. The terminal tool is governed by command-pattern rules, not path rules, and under the new [OS sandbox](https://zed.dev/docs/ai/sandboxing) terminal commands \"can read most of the filesystem\" (B2 ○). v1.22.0 stopped one invalid pattern from discarding the valid exclusion/read-only/private rules beside it, which narrows a fail-open in its own dialect rather than closing it: a matcher that cannot be built still matches nothing ([#64525](https://github.com/zed-industries/zed/pull/64525)) (C2 ◐). `always_deny` rules are \"highest priority, cannot be overridden\" and still block when every tool action is auto-approved (C1 ●); agent edits inside `.zed/`, where project `private_files` live, always prompt ([source](https://github.com/zed-industries/zed/blob/main/crates/agent/src/tools/tool_permissions.rs)), but sandboxed terminal commands can still write project files (C3 ◐). Enforcement is deterministic editor code, confirmed by the project's own advisory for [CVE-2026-27967](https://github.com/zed-industries/zed/security/advisories/GHSA-786m-x2vc-5235) — agent file tools checked `private_files` on logical paths, so symlinks escaped; patched 0.225.9 (D1 ●, D2 ◐)."
+      "note": "`private_files` and `read_only_files` glob settings, project-resident ([all settings](https://zed.dev/docs/reference/all-settings)); project settings files can also sit in subdirectories — \"You can also add settings files in subdirectories for more granular control\" ([configuring Zed](https://github.com/zed-industries/zed/blob/v1.23.2/docs/src/configuring-zed.md)) — and the agent's file tools look the settings up for the path being accessed ([source](https://github.com/zed-industries/zed/blob/v1.23.2/crates/agent/src/tools/read_file_tool.rs#L318-L333)) (A1/A2/A3 ●). [Tool permissions](https://zed.dev/docs/ai/tool-permissions) add path-matched `always_deny` rules for `edit_file`, `write_file`, `delete_path`, `move_path` and `create_directory` (B3 ●). Content of private files is gated, and `list_directory` and `grep` skip private entries, but `find_path` returns matching worktree entries without a `private_files` check ([source](https://github.com/zed-industries/zed/blob/v1.23.2/crates/agent/src/tools/find_path_tool.rs#L182-L211)), so names can still reach the model (B1 ◐). The terminal tool is governed by command-pattern rules, not path rules, and under the [OS sandbox](https://zed.dev/docs/ai/sandboxing) \"Terminal commands can read most of the filesystem\" (B2 ○). Fail direction is split: an invalid `tool_permissions` regex blocks the tool — \"If any patterns failed to compile, block the tool call entirely\" ([source](https://github.com/zed-industries/zed/blob/v1.23.2/crates/agent/src/tool_permissions.rs#L267-L270)) — while v1.22.0 only stopped one invalid file pattern from discarding the valid exclusion/read-only/private rules beside it: the invalid entry itself is still dropped, only logged, and \"If the combined set cannot be built, reports the error and matches nothing\" ([#64525](https://github.com/zed-industries/zed/pull/64525), [source](https://github.com/zed-industries/zed/blob/v1.23.2/crates/util/src/paths.rs#L778-L779)) (C2 ◐). `always_deny` is \"highest priority, cannot be overridden\", and global auto-approve leaves \"`always_deny`, `always_confirm`, built-in security rules, and paths inside Zed settings directories\" still prompting or blocking (C1 ●). Agent edits inside `.zed/`, where project `private_files` live, always prompt ([source](https://github.com/zed-industries/zed/blob/v1.23.2/crates/agent/src/tools/tool_permissions.rs#L498-L520)), but sandboxed \"Terminal commands can write inside open project directories, except for protected Git metadata\" (C3 ◐). The sandbox's own restrictions lift through remembered grants, for \"the rest of the current thread\" or \"always\", up to `allow_unsandboxed` (D3 ◐). Subagents get \"the same tools as the parent agent\" ([tools](https://zed.dev/docs/ai/tools)), so the file-tool checks carry, but processes spawned from the terminal are not bound by `private_files`, and the sandbox \"does not sandbox … External Agents\" (D4 ◐). Enforcement is deterministic editor code, confirmed by the project's own advisory for [CVE-2026-27967](https://github.com/zed-industries/zed/security/advisories/GHSA-786m-x2vc-5235): agent file tools checked `private_files` on logical paths, so symlinks escaped; patched in 0.225.9. Today, symlinks resolving outside the project trigger an always-prompt, while the private check still runs on the project-relative path (D1 ●, D2 ◐). Not documented: whether a settings edit reaches a running agent before its next operation (B4 ?), and whether private-file patterns or names enter model context (C4 ?). Rules name no agent (A4 ○) and use Zed's own settings format (A5 ○)."
     }
   ],
-  "findings": "Three columns carry the headline. **A4 (per-agent) has no ●**: no harness lets a directory say which tools are welcome; the closest is JetBrains' `.noai`, a single-vendor kill switch. **A5 (shared grammar) has no ●**: every rules format is a proprietary dialect, at best borrowing `.gitignore` syntax, and rules travel between tools only where one vendor chooses to read another's file. **B2 (shell coverage) has a single ●**: only OpenAI Codex CLI's always-on kernel sandbox closes it by default; five harnesses close it only partly, mostly with an opt-in sandbox, and five not at all. The {?} marks are a finding too: for Aider, goose and Cline most of these questions have no documented answer, and more than a quarter of all cells are {?}.",
+  "findings": "Four columns carry the headline. **A4 (per-agent) is ○ everywhere**: no harness lets a directory say which tools are welcome; the closest, JetBrains' `.aiignore`, binds only Junie and lets the other agents in the same IDE through. **A5 (shared grammar) has no ●**: every rules format is a proprietary dialect, at best borrowing `.gitignore` syntax, and rules travel between tools only where one vendor chooses to read another's file. **B1 (context gating) has no ●**: no harness documents keeping the names of restricted files out of model context as well as their content. **B2 (shell coverage) has a single ●**: only OpenAI Codex CLI closes it, enforcing its deny rules in an OS sandbox that also covers spawned commands; seven harnesses close it only partly, mostly with something opt-in (a sandbox, a hook, approval prompts), and four not at all. The {?} marks are a finding too: for Aider, Cursor and goose, seven of the seventeen questions have no documented answer, and nearly a fifth of all cells are {?}.",
   "history": [
+    {
+      "date": "2026-10-08",
+      "label": "full re-score",
+      "text": "all thirteen harnesses re-scored against the current release of each, now recorded with each harness; source links pinned to those releases. Six requirements were reworded to match the agentaccess.txt specification more closely: A4 now also asks that a tool the rules do not name is denied; B1 covers the names of restricted paths and their transmission, not only their content; B3 adds renaming; B4 asks that a change takes effect no later than the next operation, not merely without a restart; C2 covers a policy file that cannot be read, not only a malformed rule; D3 asks that an override lasts one invocation and is never remembered.",
+      "changes": [
+        { "harness": "aider", "requirement": "B2", "from": "u", "to": "n" },
+        { "harness": "aider", "requirement": "B3", "from": "u", "to": "n" },
+        { "harness": "aider", "requirement": "B4", "from": "u", "to": "p" },
+        { "harness": "aider", "requirement": "D1", "from": "u", "to": "y" },
+        {
+          "harness": "claude-code",
+          "requirement": "B3",
+          "from": "y",
+          "to": "p"
+        },
+        {
+          "harness": "claude-code",
+          "requirement": "B4",
+          "from": "y",
+          "to": "p"
+        },
+        { "harness": "cline", "requirement": "B1", "from": "n", "to": "p" },
+        { "harness": "cline", "requirement": "B2", "from": "n", "to": "p" },
+        { "harness": "cline", "requirement": "B3", "from": "u", "to": "p" },
+        { "harness": "cline", "requirement": "B4", "from": "u", "to": "p" },
+        { "harness": "cline", "requirement": "C1", "from": "u", "to": "n" },
+        { "harness": "cline", "requirement": "C3", "from": "u", "to": "p" },
+        { "harness": "cline", "requirement": "D2", "from": "u", "to": "p" },
+        { "harness": "cline", "requirement": "D3", "from": "u", "to": "n" },
+        { "harness": "cursor", "requirement": "C2", "from": "p", "to": "u" },
+        { "harness": "cursor", "requirement": "C3", "from": "u", "to": "p" },
+        {
+          "harness": "deepseek-harness",
+          "requirement": "B4",
+          "from": "u",
+          "to": "y"
+        },
+        {
+          "harness": "deepseek-harness",
+          "requirement": "C2",
+          "from": "u",
+          "to": "p"
+        },
+        {
+          "harness": "deepseek-harness",
+          "requirement": "C4",
+          "from": "u",
+          "to": "p"
+        },
+        {
+          "harness": "gemini-cli",
+          "requirement": "B1",
+          "from": "y",
+          "to": "p"
+        },
+        {
+          "harness": "gemini-cli",
+          "requirement": "D1",
+          "from": "y",
+          "to": "p"
+        },
+        {
+          "harness": "gemini-cli",
+          "requirement": "D3",
+          "from": "u",
+          "to": "n"
+        },
+        {
+          "harness": "github-copilot-agent-surfaces",
+          "requirement": "C2",
+          "from": "u",
+          "to": "p"
+        },
+        {
+          "harness": "github-copilot-agent-surfaces",
+          "requirement": "D3",
+          "from": "u",
+          "to": "p"
+        },
+        {
+          "harness": "github-copilot-agent-surfaces",
+          "requirement": "D4",
+          "from": "u",
+          "to": "p"
+        },
+        { "harness": "goose", "requirement": "C2", "from": "u", "to": "n" },
+        { "harness": "goose", "requirement": "C4", "from": "u", "to": "n" },
+        { "harness": "goose", "requirement": "D3", "from": "u", "to": "n" },
+        {
+          "harness": "jetbrains-ai-assistant-junie",
+          "requirement": "A4",
+          "from": "p",
+          "to": "n"
+        },
+        {
+          "harness": "jetbrains-ai-assistant-junie",
+          "requirement": "B2",
+          "from": "n",
+          "to": "p"
+        },
+        {
+          "harness": "jetbrains-ai-assistant-junie",
+          "requirement": "C1",
+          "from": "u",
+          "to": "n"
+        },
+        {
+          "harness": "openai-codex-cli",
+          "requirement": "A1",
+          "from": "p",
+          "to": "y"
+        },
+        {
+          "harness": "openai-codex-cli",
+          "requirement": "A3",
+          "from": "p",
+          "to": "y"
+        },
+        {
+          "harness": "openai-codex-cli",
+          "requirement": "D3",
+          "from": "p",
+          "to": "n"
+        },
+        {
+          "harness": "openai-codex-cli",
+          "requirement": "D4",
+          "from": "y",
+          "to": "p"
+        },
+        { "harness": "pi", "requirement": "D1", "from": "p", "to": "na" },
+        {
+          "harness": "windsurf-devin",
+          "requirement": "B1",
+          "from": "y",
+          "to": "p"
+        },
+        {
+          "harness": "windsurf-devin",
+          "requirement": "D3",
+          "from": "u",
+          "to": "p"
+        },
+        { "harness": "zed", "requirement": "B1", "from": "y", "to": "p" },
+        { "harness": "zed", "requirement": "D3", "from": "u", "to": "p" },
+        { "harness": "zed", "requirement": "D4", "from": "u", "to": "p" }
+      ]
+    },
     {
       "date": "2026-10-06",
       "label": "initial scoring",

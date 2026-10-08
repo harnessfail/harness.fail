@@ -80,9 +80,9 @@ A shift is a release or announcement that changes where file-access policy lives
 
 ## Disputing a matrix score
 
-Each harness in `data/matrix.json` has a mark per requirement and a note on what the marks rest on. Marks are `y` (● yes, documented), `p` (◐ partial, or documented gaps), `n` (○ no), `u` (? undocumented) and `na` (— not applicable).
+Each harness in `data/matrix.json` has a mark per requirement, a note on what the marks rest on, and a `version`: the release that was current when the row was last scored. Update the version whenever you re-score the row. Marks are `y` (● yes, documented), `p` (◐ partial, or documented gaps), `n` (○ no), `u` (? undocumented) and `na` (— not applicable).
 
-A score cites public sources only: vendor documentation, public source code, the project's own issue tracker, and security advisories, primary sources preferred. `u` means no authoritative statement was found either way; inference is not scoring. To dispute a score, change the mark and the note together, cite the source in the note, and add a dated entry to `history` saying what changed.
+A score cites public sources only: vendor documentation, public source code, the project's own issue tracker, and security advisories, primary sources preferred. `u` means no authoritative statement was found either way; inference is not scoring. To dispute a score, change the mark and the note together, cite the source in the note, and add a dated entry to `history` saying what changed, with each changed mark listed in its `changes` (`harness`, `requirement`, `from`, `to`).
 
 ## Corrections and removal requests
 
