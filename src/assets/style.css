@@ -126,6 +126,11 @@ a:hover {
   text-decoration-color: var(--link-hover);
 }
 
+button,
+summary {
+  touch-action: manipulation;
+}
+
 /* Section headings link to their own anchors. At rest they look like plain
    headings; hover or keyboard focus shows a faint # in the left margin.
    The "/ ''" alt text keeps the # out of screen-reader output; a browser
