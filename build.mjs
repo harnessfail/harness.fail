@@ -447,22 +447,52 @@ const link = (href, text) => `<a href="${escape(href)}" ${NEW_TAB}>${text}</a>`
 // Plain text: emphasis and the {?} mark. Only ever applied to the text
 // between code spans and links, so a `*` in a glob or a URL never pairs up
 // with one outside it.
-const plain = text =>
-  escape(text)
+// Matrix texts can also set score glyphs in the tables' face, where ●, ◐
+// and ○ share one size (glyphs), and give requirement IDs a hover title
+// (tips). The findings name their requirements in words, so they take
+// glyphs only.
+const plain = (text, { glyphs = false, tips = false } = {}) => {
+  let html = escape(text)
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\*([^*]+)\*/g, '<em>$1</em>')
     .replaceAll('{?}', '<span class="s u">?</span>')
+  if (tips) {
+    html = requirementTip(html)
+  }
+  if (glyphs) {
+    html = html.replace(
+      /[●◐○]/g,
+      glyph => `<span class="glyph">${glyph}</span>`,
+    )
+  }
+  return html
+}
+
+// Outside the tables a requirement appears only as its ID (B2, C1–C4), so
+// matrix texts give each ID a hover title with the requirement's name, the
+// way the score glyphs carry theirs.
+const requirementTitles = new Map(
+  matrix.groups
+    .flatMap(group => group.requirements)
+    .map(requirement => [requirement.id, requirement.name]),
+)
+const requirementTip = html =>
+  html.replace(/\b[A-Z]\d+\b/g, id =>
+    requirementTitles.has(id)
+      ? `<span class="rid-tip" title="${escape(requirementTitles.get(id))}">${id}</span>`
+      : id,
+  )
 
 // Code spans and links are cut out first, whichever starts earlier: a link
 // inside backticks stays literal, and a link's text may hold code. A link
 // that fails validation's URL rule renders as its plain text.
 const TOKEN = /(`[^`]+`|\[[^\]]+\]\([^)\s]*\))/
-const inline = text =>
+const inline = (text, options = {}) =>
   text
     .split(TOKEN)
     .map((part, index) => {
       if (index % 2 === 0) {
-        return plain(part)
+        return plain(part, options)
       }
       if (part.startsWith('`')) {
         return `<code>${escape(part.slice(1, -1))}</code>`
@@ -711,7 +741,7 @@ const matrixNotes = matrix.harnesses
   .map(
     harness =>
       `<h4 id="${harness.id}"><a class="self" href="#${harness.id}">${escape(harness.name)}</a>` +
-      ` <span class="version">${escape(harness.version)}</span></h4>\n<p>${inline(harness.note)}</p>`,
+      ` <span class="version">${escape(harness.version)}</span></h4>\n<p>${inline(harness.note, { glyphs: true, tips: true })}</p>`,
   )
   .join('\n\n')
 
@@ -727,8 +757,9 @@ const markChanges = changes => {
         .get(harness.id)
         .map(
           change =>
-            `${change.requirement} ${markHtml[change.from]} <span aria-hidden="true">→</span>` +
-            `<span class="vh">changed to</span> ${markHtml[change.to]}`,
+            `<span class="change">${requirementTip(change.requirement)} ` +
+            `${markHtml[change.from]} <span aria-hidden="true">→</span>` +
+            `<span class="vh">changed to</span> ${markHtml[change.to]}</span>`,
         )
         .join(', ')
       return `<li><a href="#${harness.id}">${escape(harness.name)}</a>: ${items}</li>`
@@ -748,7 +779,7 @@ const matrixHistory = matrix.history
   .map(entry => {
     const label = entry.label ? ` (${escape(entry.label)})` : ''
     return (
-      `<p><strong>${longDate(entry.date)}${label}</strong> — ${inline(entry.text)}</p>` +
+      `<p><strong>${longDate(entry.date)}${label}</strong> — ${inline(entry.text, { glyphs: true, tips: true })}</p>` +
       markChanges(entry.changes)
     )
   })
@@ -860,7 +891,7 @@ const renderPage = () =>
     'record': record.classes.map(recordClass).join('\n'),
     'matrix-meta': matrixMeta,
     'matrix-tables': matrix.groups.map(matrixGroup).join('\n\n'),
-    'matrix-findings': `<p>${inline(matrix.findings)}</p>`,
+    'matrix-findings': `<p>${inline(matrix.findings, { glyphs: true })}</p>`,
     'matrix-notes': matrixNotes,
     'matrix-history': matrixHistory,
     'shifts': shiftItems,

@@ -1005,8 +1005,15 @@ tbody th a {
   line-height: 1;
 }
 
-.s[title] {
+.s[title],
+.rid-tip[title] {
   cursor: help;
+}
+
+/* Score glyphs in running text take the tables' sans face, where ●, ◐
+   and ○ draw at one size; the serif face draws ● and ○ smaller. */
+.glyph {
+  font-family: var(--sans);
 }
 
 .s.y {
@@ -1091,6 +1098,11 @@ details.changes li::before {
 
 details.changes .s {
   min-width: 0;
+}
+
+/* A line wraps between changes, never inside one. */
+details.changes .change {
+  white-space: nowrap;
 }
 
 .legend {
