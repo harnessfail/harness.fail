@@ -51,7 +51,7 @@
         {
           "id": "A4",
           "name": "Per-agent",
-          "description": "Rules can name *which* tool they bind — \"tool X may work here, tool Y may not.\"",
+          "description": "Rules can name *which* tool they bind — \"tool X may work here, tool Y may not\" — and a tool the rules do not name is denied rather than let through.",
           "spec": [
             {
               "label": "§6",
@@ -80,7 +80,7 @@
         {
           "id": "B1",
           "name": "Context gating",
-          "description": "Restricted content is kept out of model context — reads, indexing, attachments — not merely deprioritized.",
+          "description": "Restricted content, and the names of restricted paths, are kept out of model context and not transmitted — reads, listings, indexing, attachments — not merely deprioritized.",
           "spec": [
             {
               "label": "§3",
@@ -106,7 +106,7 @@
         {
           "id": "B3",
           "name": "Write gating",
-          "description": "Rules cover create/modify/delete, not only reads — a declarative do-not-touch.",
+          "description": "Rules cover create/modify/rename/delete, not only reads — a declarative do-not-touch.",
           "spec": [
             {
               "label": "§7",
@@ -117,7 +117,7 @@
         {
           "id": "B4",
           "name": "Pre-flight",
-          "description": "Rules are evaluated *before* content is touched — at workspace open for ambient agents, before each operation otherwise — and changes take effect without a restart.",
+          "description": "Rules are evaluated *before* content is touched — at workspace open for ambient agents, before each operation otherwise — and a change takes effect no later than the next operation.",
           "spec": [
             {
               "label": "§4",
@@ -147,7 +147,7 @@
           "id": "C2",
           "name": "Fail-closed policy errors",
           "short": "Fail-closed errors",
-          "description": "A malformed or invalid rule restricts rather than being silently dropped.",
+          "description": "A malformed or invalid rule, or a policy file that cannot be read, restricts rather than being dropped.",
           "spec": [
             {
               "label": "§5",
@@ -217,7 +217,7 @@
         {
           "id": "D3",
           "name": "Deliberate override",
-          "description": "A restriction is lifted only by an explicit user action naming that restriction — never by a blanket bypass mode, and never by consent the model parsed out of its own context.",
+          "description": "A restriction is lifted only by an explicit user action naming that restriction, for one invocation — never by a remembered setting, a blanket bypass mode, or consent the model parsed out of its own context.",
           "spec": [
             {
               "label": "§7",
