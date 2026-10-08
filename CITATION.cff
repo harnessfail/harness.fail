@@ -6,8 +6,8 @@ abstract: 'A record of security issues that AI agent harnesses failed to prevent
 url: 'https://harness.fail'
 repository-code: 'https://github.com/harnessfail/harness.fail'
 license: CC-BY-4.0
-version: '2026-10-06'
-date-released: 2026-10-06
+version: '2026-10-08'
+date-released: 2026-10-08
 identifiers:
   - type: doi
     value: 10.5281/zenodo.23199129
