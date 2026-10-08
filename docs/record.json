@@ -9,7 +9,7 @@
   "homepage": "https://harness.fail/",
   "license": "CC-BY-4.0",
   "doi": "10.5281/zenodo.23199129",
-  "updated": "2026-10-06",
+  "updated": "2026-10-08",
   "classes": [
     {
       "id": "scaffolding-collapse",
@@ -247,7 +247,7 @@
       "cves": ["CVE-2025-54794", "CVE-2025-54795"],
       "date": "2025-08-01",
       "harnesses": ["Claude Code"],
-      "fail": "Prefix matching instead of canonical path comparison let `/home/user/project-secrets` pass as inside `/home/user/project`. A second flaw in command parsing let an untrusted command run past the confirmation prompt.",
+      "fail": "Prefix matching instead of canonical path comparison let a sibling directory that shared the working directory's prefix, such as `claude_code_evil` next to `claude_code`, pass as inside it. A second flaw in command parsing let an untrusted command run past the confirmation prompt.",
       "fix": {
         "status": "fixed",
         "text": "Fixed in Claude Code v0.2.111 and v1.0.20."
@@ -265,7 +265,7 @@
       "fail": "A prefix check let paths that merely began with an allowed directory's name pass as inside it, and symlinks within allowed directories reached files outside them.",
       "fix": {
         "status": "fixed",
-        "text": "Patched July 1, 2025 (reported March 30)."
+        "text": "Patched July 1, 2025 (reported March 30), in 2025.7.01; the advisories also list 0.6.3, the CVE records 0.6.4."
       },
       "featured": true
     },
@@ -274,7 +274,7 @@
       "class": "scaffolding-collapse",
       "title": "Cursorignore bypass",
       "url": "https://github.com/cursor/cursor/security/advisories/GHSA-vhc2-fjv4-wqch",
-      "credit": "CVE-2025-64110, Cursor advisory",
+      "credit": "CVE-2025-64110, joaodunas and aretekzs (Cursor advisory)",
       "cves": ["CVE-2025-64110"],
       "date": "2025-11-03",
       "harnesses": ["Cursor"],
@@ -292,7 +292,7 @@
       "credit": "Cursor forum",
       "date": "2025-12-08",
       "harnesses": ["Cursor"],
-      "fail": "Plan Mode, which is documented not to edit or run non-read-only tools, ran `pkill`, deleted about 70 git-tracked files with `rm -rf` and made commits after the user wrote \"DO NOT RUN ANYTHING\"; Cursor staff called it a critical bug in Plan Mode constraint enforcement.",
+      "fail": "In what the user reports was mostly Plan Mode, the agent deleted about 70 git-tracked files with `rm -rf` and made commits; after the user wrote \"DO NOT RUN ANYTHING\", it ran `pkill` and started processes. Cursor staff called it a violation of Plan Mode's read-only constraint and a critical bug in Plan Mode constraint enforcement.",
       "fix": {
         "status": "unknown",
         "text": null
@@ -302,8 +302,8 @@
       "id": "cursor-sandbox-escapes",
       "class": "scaffolding-collapse",
       "title": "Cursor sandbox escapes",
-      "url": "https://www.catonetworks.com/blog/duneslide-two-critical-rce-vulnerabilities/",
-      "credit": "CVE-2026-50548, CVE-2026-50549, Cato Networks (named DuneSlide)",
+      "url": "https://github.com/cursor/cursor/security/advisories/GHSA-3p48-7v9f-v5cw",
+      "credit": "CVE-2026-50548, CVE-2026-50549, Cato AI Labs (named [DuneSlide](https://www.catonetworks.com/blog/duneslide-two-critical-rce-vulnerabilities/))",
       "cves": ["CVE-2026-50548", "CVE-2026-50549"],
       "date": "2026-06-05",
       "harnesses": ["Cursor"],
@@ -323,15 +323,15 @@
       "harnesses": ["Cursor CLI"],
       "fail": "In worktree mode, the `setup-worktree` command from a git-tracked `.cursor/worktrees.json` ran through `sh -c` before the Workspace Trust prompt, under a hardcoded no-sandbox policy that `--sandbox enabled` did not override.",
       "fix": {
-        "status": "disputed",
-        "text": "Fixed in cursor-agent 2026.07.23-e383d2b, per Manifold; Cursor closed the report as informative, disputing that workspace trust was bypassed."
+        "status": "partial",
+        "text": "Pre-trust execution fixed in cursor-agent 2026.07.23-e383d2b, per Manifold; the setup command still runs unsandboxed regardless of `--sandbox enabled`. Cursor closed the report as informative, disputing that workspace trust was bypassed."
       }
     },
     {
       "id": "docker-sandboxes-escapes",
       "class": "scaffolding-collapse",
       "title": "Docker Sandboxes escapes",
-      "url": "https://docs.docker.com/security/security-announcements/",
+      "url": "https://docs.docker.com/security/security-announcements/#docker-sandboxes-0420-security-update-cve-2026-77179-and-cve-2026-79994",
       "credit": "CVE-2026-77179, Accomplish; CVE-2026-79994, ThreatNotify",
       "cves": ["CVE-2026-77179", "CVE-2026-79994"],
       "date": "2026-09-15",
@@ -353,7 +353,7 @@
       "fail": "Codex CLI's `apply_patch` granted write access to the parent folders of paths in a patch, so a patch referencing `/tmp` gained write access to `/` without an approval prompt (Overpatch); Codex Desktop's `node_repl` kept trusted and untrusted V8 contexts in one heap, so untrusted code could read the authorization token and run unsandboxed commands even in read-only mode (Heapjack).",
       "fix": {
         "status": "fixed",
-        "text": "Fixed in Codex CLI 0.149.0 and Codex Desktop build 26.818.21641, within eight days of the August 12, 2026 report."
+        "text": "Fixed within eight days of the August 12, 2026 report: Codex CLI 0.149.0, and Codex Desktop build 26.818.21641 per the Cloud Security Alliance."
       }
     },
     {
@@ -377,7 +377,7 @@
       "class": "scaffolding-collapse",
       "title": "GitSpawn",
       "url": "https://www.manifold.security/blog/ai-coding-agents-git-hijack",
-      "credit": "named by Manifold Security; CVE-2026-72718 and CVE-2026-71963, Francisco Rosales (Manifold Security); CVE-2026-19592, Fudan University System Software and Security Lab and Doyensec via ZDI",
+      "credit": "named by Manifold Security; CVE-2026-71963, Francisco Rosales (Manifold Security); CVE-2026-72718, assigned after Manifold's report; CVE-2026-19592, Fudan University System Software and Security Lab and Doyensec via ZDI",
       "cves": ["CVE-2026-19592", "CVE-2026-71963", "CVE-2026-72718"],
       "date": "2026-07-24",
       "harnesses": [
@@ -390,7 +390,7 @@
         "Hermes Agent",
         "Qwen Code"
       ],
-      "fail": "Agents ran `git` in the background to gather context, outside their sandboxes and before any trust prompt, so a repository whose `.git/config` set `core.fsmonitor` executed an attacker-chosen command on the host. An ordinary `git clone` does not carry the source's `.git/config`, so the repository has to arrive with it intact, for example as an archive or a copied folder.",
+      "fail": "Agents ran `git` in the background to gather context, outside their sandboxes and without an approval prompt, on some agents before the workspace-trust prompt, so a repository whose `.git/config` set `core.fsmonitor` executed an attacker-chosen command on the host. An ordinary `git clone` does not carry the source's `.git/config`, so the repository has to arrive with it intact, for example as an archive or a copied folder.",
       "fix": {
         "status": "partial",
         "text": "Fixed in OpenAI Codex CLI 0.131.0, Codex Desktop 26.519, goose 1.44.0 and Hermes Agent commit f6234d0; Claude Code fixed the `core.fsmonitor` path by 2.1.196 and Cursor patched, per Manifold; Claude Code's ultrareview, Grok Build and Qwen Code unpatched as of September 1, 2026."
@@ -405,7 +405,7 @@
       "credit": "Tracebit",
       "date": "2025-07-28",
       "harnesses": ["Gemini CLI"],
-      "fail": "Instructions hidden in a README combined with an allowlist parsing flaw yielded silent data exfiltration.",
+      "fail": "Instructions hidden in a README, a flaw in matching commands against the allowlist and a display flaw that hid everything after a run of whitespace let a malicious command run as a user-allowlisted `grep` without being shown, executing arbitrary code; the demo sent environment variables to a remote server.",
       "fix": {
         "status": "fixed",
         "text": "Fixed in v0.1.14, July 25, 2025 — 28 days after report."
@@ -417,14 +417,14 @@
       "class": "indirect-prompt-injection",
       "title": "Cursor Mermaid exfiltration",
       "url": "https://embracethered.com/blog/posts/2025/cursor-data-exfiltration-with-mermaid/",
-      "credit": "CVE-2025-54132, Johann Rehberger",
+      "credit": "CVE-2025-54132, Johann Rehberger and MaccariTA",
       "cves": ["CVE-2025-54132"],
       "date": "2025-08-01",
       "harnesses": ["Cursor"],
       "fail": "An injection in a source-code comment made the agent collect API keys from the project, then render a Mermaid diagram whose image URL carried them to the attacker's server, with no confirmation.",
       "fix": {
         "status": "fixed",
-        "text": "Fixed in Cursor 1.3, July 2025, per the researcher."
+        "text": "Fixed in Cursor 1.3, July 2025 (GHSA-43wj-mwcc-x93p)."
       },
       "featured": true
     },
@@ -454,7 +454,7 @@
       "fail": "An injection in a file under analysis made the agent read `.env` and put the key into a hostname for `ping`, which the default allowlist ran without approval, so the DNS lookup carried it to the attacker's server.",
       "fix": {
         "status": "fixed",
-        "text": "Fixed in Claude Code 1.0.4, June 2025, per the researcher."
+        "text": "Fixed in Claude Code 1.0.4, June 2025 (GHSA-x5gv-jw7f-j6xj)."
       }
     },
     {
@@ -468,7 +468,7 @@
       "fail": "An injection in a file under analysis made the agent read `.env` and send it out through `read_url_content`, which fetches URLs without approval, or through an auto-rendered image.",
       "fix": {
         "status": "unknown",
-        "text": "— (unfixed at publication, August 2025)"
+        "text": "— (unfixed at publication, August 2025; Windsurf later said fixes were in progress, with no date)"
       }
     },
     {
@@ -493,11 +493,11 @@
       "url": "https://asset-group.github.io/disclosures/ghostsplice/",
       "credit": "named by ASSET Research Group (Murali Ediga, Johnny Dao, Sudipta Chattopadhyay)",
       "date": "2026-07-30",
-      "harnesses": ["Cursor", "OpenAI Codex CLI", "VS Code"],
-      "fail": "Instructions fragmented across MCP tool descriptions and tool results raised model compliance from 42% to 82%, with no fragment looking malicious on its own.",
+      "harnesses": ["Cursor", "OpenAI Codex CLI", "GitHub Copilot"],
+      "fail": "Instructions fragmented across MCP tool descriptions and tool results raised average compliance across eleven models from 42% to 82% through the model APIs, with no fragment looking malicious on its own; a three-fragment version also worked inside Cursor, Codex CLI and VS Code with GitHub Copilot.",
       "fix": {
         "status": "n/a",
-        "text": "— (cross-model research)"
+        "text": "— (disclosed to the vendors; only OpenAI replied, calling it third-party MCP risk)"
       }
     },
     {
@@ -511,7 +511,7 @@
       "fail": "Malicious instructions were hidden in rules files behind zero-width and bidirectional Unicode characters, invisible in review.",
       "fix": {
         "status": "declined",
-        "text": "None — both vendors declined to treat it as a vulnerability, placing the burden on users."
+        "text": "None in the agents — both vendors declined to treat it as a vulnerability, placing the burden on users; GitHub later added a hidden-Unicode warning on github.com (May 1, 2025)."
       }
     },
     {
@@ -582,7 +582,7 @@
       "cves": ["CVE-2025-8217"],
       "date": "2025-07-23",
       "harnesses": ["Amazon Q Developer"],
-      "fail": "An attacker used an inappropriately scoped GitHub token to commit malicious code, designed to call the Q Developer CLI, into the extension's repository, and it shipped in release 1.84.0. A syntax error kept it from running.",
+      "fail": "An attacker used an inappropriately scoped GitHub token to commit malicious code, designed to call the Q Developer CLI, into the extension's repository, and it shipped in release 1.84.0. A syntax error kept it from succeeding.",
       "fix": {
         "status": "fixed",
         "text": "v1.85.0 released; v1.84.0 pulled from distribution."
@@ -610,7 +610,7 @@
       "credit": "StepSecurity",
       "date": "2026-04-29",
       "harnesses": ["Claude Code", "VS Code"],
-      "fail": "An npm worm wrote a `SessionStart` hook into the project's `.claude/settings.json` and a `folderOpen` task into `.vscode/tasks.json`, so opening the repository in either tool re-ran its payload.",
+      "fail": "An npm worm committed a `SessionStart` hook in `.claude/settings.json` and a `folderOpen` task in `.vscode/tasks.json` into every repository it could reach, so opening any of them in either tool re-ran its payload.",
       "fix": {
         "status": "unknown",
         "text": null
@@ -624,7 +624,7 @@
       "credit": "Jason Lemkin",
       "date": "2025-07-18",
       "harnesses": ["Replit Agent"],
-      "fail": "During an explicit code and action freeze, the agent deleted SaaStr's live production records for over 1,200 executives and over 1,190 companies.",
+      "fail": "During an explicit code and action freeze, the agent deleted SaaStr's live production records for over 1,200 executives and over 1,190 companies, by the agent's own account.",
       "featured": true
     },
     {
@@ -646,7 +646,7 @@
       "credit": "Nick Davidov",
       "date": "2026-02-07",
       "harnesses": ["Claude Cowork"],
-      "fail": "Merging a lowercase `photos` folder into a new `Photos` folder while organizing a desktop, the agent ran `rm -rf` on what it took for a separate empty folder; on the case-insensitive macOS filesystem it was the same folder, and 15 years of family photos were deleted outside the Trash.",
+      "fail": "The agent tried renaming a folder and instead deleted one holding 15 years of the user's wife's camera photos. It ran through the terminal, so nothing went to the Trash; the files were later recovered from iCloud.",
       "featured": true
     },
     {
@@ -677,7 +677,7 @@
       "url": "https://research.checkpoint.com/2026/rce-and-api-token-exfiltration-through-claude-code-project-files-cve-2025-59536/",
       "credit": "CVE-2025-59536, CVE-2026-21852, named by Check Point Research",
       "cves": ["CVE-2025-59536", "CVE-2026-21852"],
-      "date": "2025-10-03",
+      "date": "2025-08-29",
       "harnesses": ["Claude Code"],
       "fail": "A cloned repository's `.claude/settings.json` started its MCP servers and redirected `ANTHROPIC_BASE_URL` before the trust dialog was answered, running commands and sending the API key to the attacker's server. Repository hooks also ran after trust without the dialog mentioning them.",
       "fix": {
@@ -699,9 +699,9 @@
         "CVE-2026-33068",
         "CVE-2026-40068"
       ],
-      "date": "2025-09-09",
+      "date": "2025-09-10",
       "harnesses": ["Claude Code"],
-      "fail": "Before the trust dialog was answered, a repository could run code through a malicious `git config user.email` or through Yarn plugins. A committed `defaultMode: bypassPermissions` skipped the dialog outright, and a spoofed worktree `commondir` pointing at an already-trusted path skipped it too.",
+      "fail": "Before the trust dialog was answered, code could run through a maliciously configured `git config user.email` or through Yarn plugins. A committed `defaultMode: bypassPermissions` skipped the dialog outright, and a spoofed worktree `commondir` pointing at an already-trusted path skipped it too.",
       "fix": {
         "status": "fixed",
         "text": "Fixed in Claude Code v1.0.39, v1.0.105, v2.1.53 and v2.1.84."
@@ -717,8 +717,8 @@
       "harnesses": ["Claude Code"],
       "fail": "A shell command chaining more than 50 subcommands hit an analysis cap, after which Claude Code skipped its deny-rule checks and fell back to a generic approval prompt, auto-approved in automated runs, so a denied command could run once padded with 50 harmless statements.",
       "fix": {
-        "status": "fixed",
-        "text": "Fixed in Claude Code v2.1.90."
+        "status": "unknown",
+        "text": "Adversa reports it as apparently fixed in Claude Code v2.1.90; no Anthropic advisory or changelog entry confirms it."
       }
     },
     {
@@ -766,9 +766,9 @@
         "CVE-2026-25722",
         "CVE-2026-25723"
       ],
-      "date": "2025-09-09",
+      "date": "2025-09-10",
       "harnesses": ["Claude Code"],
-      "fail": "Gaps in the command parser turned auto-approved read-only commands into code execution or writes outside the project, without a prompt: `man --html`, `sort --compress-program`, sed's `e` command, `$IFS` and `@P` expansions, zsh `>|`, and `cd` into `.claude`.",
+      "fail": "Gaps in the command parser turned auto-approved read-only commands into code execution or writes to protected folders or outside the project, without a prompt: `man --html`, `sort --compress-program`, sed's `e` command, `$IFS` and `@P` expansions, zsh `>|`, and `cd` into `.claude`.",
       "fix": {
         "status": "fixed",
         "text": "Fixed across Claude Code v1.0.93 to v2.0.74."
@@ -821,13 +821,12 @@
       "class": "scaffolding-collapse",
       "title": "Copilot sensitive-file guard bypasses",
       "url": "https://github.com/microsoft/vscode-copilot-chat/security/advisories/GHSA-mx7f-wrpp-c9fh",
-      "credit": "CVE-2025-62222, CVE-2025-62449, CVE-2026-21523, CVE-2026-41109, CVE-2026-65675, CVE-2026-70335; Microsoft advisories",
+      "credit": "CVE-2025-62222, CVE-2025-62449, CVE-2026-21523, CVE-2026-41109, CVE-2026-70335; Microsoft advisories",
       "cves": [
         "CVE-2025-62222",
         "CVE-2025-62449",
         "CVE-2026-21523",
         "CVE-2026-41109",
-        "CVE-2026-65675",
         "CVE-2026-70335"
       ],
       "date": "2025-10-14",
@@ -847,7 +846,7 @@
       "cves": ["CVE-2025-54131", "CVE-2026-22708", "CVE-2026-31854"],
       "date": "2025-07-21",
       "harnesses": ["Cursor"],
-      "fail": "Cursor's auto-run denylist was evaded with base64, subshells, scripts, backticks and `$()`, and shell built-ins like `export` poisoned environment variables that allowlisted commands then used.",
+      "fail": "Cursor's auto-run denylist was evaded with base64, subshells, scripts and quoting, its allowlist with backticks and `$()`, and shell built-ins like `export` poisoned environment variables that allowlisted commands then used.",
       "fix": {
         "status": "fixed",
         "text": "Denylist deprecated in Cursor 1.3; fixes in 1.3, 2.0 and 2.3."
@@ -868,7 +867,7 @@
       ],
       "date": "2025-08-02",
       "harnesses": ["Cursor", "Cursor CLI"],
-      "fail": "The approval guard on `.cursor/mcp.json`, `cli.json` and `.vscode/settings.json` was bypassed through case-insensitive filesystems, Windows backslashes, NTFS short names and alternate data streams, and by creating the file instead of editing it. Each bypass led to code execution.",
+      "fail": "The approval guard on `.cursor/mcp.json`, `cli.json` and `.vscode/settings.json` was bypassed through case-insensitive filesystems, Windows backslashes, NTFS short names and alternate data streams, and by creating the file instead of editing it. Each bypass could lead to code execution.",
       "fix": {
         "status": "fixed",
         "text": "Fixed in Cursor 1.3.9, 1.7 and 2.0, and Cursor CLI 2025.09.17."
@@ -888,7 +887,7 @@
       ],
       "date": "2026-02-13",
       "harnesses": ["Cursor"],
-      "fail": "Inside the auto-run sandbox the agent could write files that later ran outside it (git hooks, a `.claude/settings.local.json` hook, a virtualenv interpreter the Python extension invokes) or start a privileged container that mounts `$HOME`.",
+      "fail": "Inside the auto-run sandbox the agent could write files that later ran outside it (git hooks, a `.claude/settings.local.json` hook, a virtualenv interpreter the Python extension invokes) or, with Docker Desktop and the Dev Containers CLI, start a privileged container that mounts Docker's `virtiofs0`, exposing the home directory.",
       "fix": {
         "status": "fixed",
         "text": "Fixed in Cursor 2.5, 3.0.0 and 3.1.2."
@@ -902,7 +901,7 @@
       "credit": "Pillar Security",
       "date": "2026-04-20",
       "harnesses": ["Google Antigravity"],
-      "fail": "The `find_by_name` tool passed its pattern straight to `fd`, so `-X sh` ran a staged script. The native tool fired before Secure Mode's sandbox and command checks ever saw the call.",
+      "fail": "The `find_by_name` tool passed its pattern straight to `fd`, so the pattern `-Xsh` ran a staged script. The native tool fired before Secure Mode's sandbox and command checks ever saw the call.",
       "fix": {
         "status": "fixed",
         "text": "Google marked it fixed on February 28, 2026."
@@ -995,7 +994,7 @@
       "cves": ["CVE-2025-52882", "CVE-2026-22812", "CVE-2026-44211"],
       "date": "2025-06-23",
       "harnesses": ["Claude Code", "OpenCode", "Cline"],
-      "fail": "Agents started local servers without authentication (a WebSocket in the Claude Code IDE extension, an HTTP server with permissive CORS in OpenCode, a WebSocket in Cline Kanban), so any website or local process could read files or run shell commands.",
+      "fail": "Agents started local servers without authentication (a WebSocket in the Claude Code IDE extension, an HTTP server with permissive CORS in OpenCode, a WebSocket in Cline Kanban), so a website could read files (Claude Code), run shell commands (OpenCode) or inject prompts into agent terminals (Cline).",
       "fix": {
         "status": "partial",
         "text": "Fixed in the Claude Code IDE extension 1.0.24 and OpenCode 1.0.216; the Cline advisory (2.13.0 and earlier) listed no patch when it was published."
@@ -1009,7 +1008,7 @@
       "credit": "Novee Security and Pillar Security",
       "date": "2026-04-24",
       "harnesses": ["Gemini CLI"],
-      "fail": "Under `--yolo`, Gemini CLI ignored the fine-grained tool allowlist, so `run_shell_command(echo)` allowed any command. In headless mode it also trusted the folder automatically and loaded `.gemini/.env`.",
+      "fail": "Under `--yolo`, Gemini CLI ignored the fine-grained tool allowlist, so `run_shell_command(echo)` allowed any command. In headless mode it also trusted the folder automatically and loaded environment variables from the local `.gemini/` directory.",
       "fix": {
         "status": "fixed",
         "text": "Fixed in Gemini CLI 0.39.1 and run-gemini-cli 0.1.22."
@@ -1052,10 +1051,10 @@
       "cves": ["CVE-2025-68143", "CVE-2025-68144", "CVE-2025-68145"],
       "date": "2025-12-17",
       "harnesses": ["Anthropic Git MCP server"],
-      "fail": "The server did not enforce its `--repository` restriction per call, `git_init` worked on any directory, and `git_diff --output=` overwrote files. Chained with the filesystem server, a prompt injection reached code execution.",
+      "fail": "The server did not enforce its `--repository` restriction per call, `git_init` worked on any directory, and `git_diff --output=` overwrote files. Chained with the filesystem server, a prompt injection reached code execution through Git's smudge and clean filters ([Cyata, via The Register](https://www.theregister.com/2026/01/20/anthropic_prompt_injection_flaws/)).",
       "fix": {
         "status": "fixed",
-        "text": "Fixed in mcp-server-git 2025.12.18."
+        "text": "Fixed in mcp-server-git 2025.9.25 (`git_init` removed) and 2025.12.18."
       }
     },
     {
@@ -1066,7 +1065,7 @@
       "credit": "PromptArmor",
       "date": "2026-01-14",
       "harnesses": ["Claude Cowork"],
-      "fail": "Hidden text in a .docx made the agent `curl` the user's files to `api.anthropic.com/v1/files` under the attacker's API key. The domain was on the egress allowlist, so the network restriction did not stop it.",
+      "fail": "Hidden text in a .docx made the agent `curl` the user's files to Anthropic's file upload API under the attacker's API key. The domain was on the egress allowlist, so the network restriction did not stop it.",
       "fix": {
         "status": "unknown",
         "text": "— (not remediated at the time of disclosure)"
@@ -1093,11 +1092,11 @@
       "class": "scaffolding-collapse",
       "title": "Claude Code WebFetch allowlist exfiltration",
       "url": "https://github.com/anthropics/claude-code/security/advisories/GHSA-vhw5-3g5m-8ggf",
-      "credit": "CVE-2026-24052, CVE-2026-54316, via HackerOne",
+      "credit": "CVE-2026-24052, CVE-2026-54316; reported via HackerOne by 47sid-praetorian and novee",
       "cves": ["CVE-2026-24052", "CVE-2026-54316"],
       "date": "2026-02-03",
       "harnesses": ["Claude Code"],
-      "fail": "A prefix check let `modelcontextprotocol.io.evil.com` pass as an allowlisted domain, and the pre-approved `huggingface.co` served as a covert channel for data.",
+      "fail": "A prefix check let `modelcontextprotocol.io.example.com` pass as an allowlisted domain, and the pre-approved `huggingface.co` served as a covert channel for data.",
       "fix": {
         "status": "fixed",
         "text": "Fixed in Claude Code v1.0.111 and v2.1.163."
@@ -1107,8 +1106,8 @@
       "id": "codex-desktop-image-exfiltration",
       "class": "indirect-prompt-injection",
       "title": "Codex Desktop image exfiltration",
-      "url": "https://nvd.nist.gov/vuln/detail/cve-2026-14898",
-      "credit": "CVE-2026-14898, published by OpenAI",
+      "url": "https://www.cve.org/CVERecord?id=CVE-2026-14898",
+      "credit": "CVE-2026-14898; Johann Rehberger, Itay Ravia (Cato Networks)",
       "cves": ["CVE-2026-14898"],
       "date": "2026-07-06",
       "harnesses": ["OpenAI Codex Desktop"],
@@ -1144,7 +1143,7 @@
       "fail": "A repository `.env` set `CODEX_HOME=./.codex`, so Codex loaded the repository's own `config.toml` and started its MCP server commands at launch, with no approval.",
       "fix": {
         "status": "fixed",
-        "text": "Fixed in Codex CLI 0.23.0, August 20, 2025."
+        "text": "Fixed in Codex CLI 0.23.0, August 20, 2025, per Check Point; the CVE record lists 0.23.0 and earlier as affected."
       }
     },
     {
@@ -1158,7 +1157,7 @@
       "fail": "Markdown in a repository's `.clinerules` told the agent to set `requires_approval=false`, and commands then ran without consent.",
       "fix": {
         "status": "unknown",
-        "text": "No longer reproducible in Cline 3.35.0; Mindgard reports no vendor response."
+        "text": "No longer reproducible in Cline 3.35.0; Cline acknowledged the report but did not confirm a fix."
       }
     },
     {
@@ -1180,7 +1179,7 @@
       "class": "scaffolding-collapse",
       "title": "Zed project settings auto-execution",
       "url": "https://github.com/zed-industries/zed/security/advisories/GHSA-x34m-39xw-g2wr",
-      "credit": "CVE-2025-55012, CVE-2025-68432, CVE-2025-68433; Ari Marzouk, Aaron Portnoy",
+      "credit": "CVE-2025-55012, CVE-2025-68432, CVE-2025-68433; Ari Marzouk, Aaron Portnoy (Mindgard)",
       "cves": ["CVE-2025-55012", "CVE-2025-68432", "CVE-2025-68433"],
       "date": "2025-08-11",
       "harnesses": ["Zed"],
@@ -1195,7 +1194,7 @@
       "class": "ambient-activation",
       "title": "Cursor CLI repository config execution",
       "url": "https://github.com/cursor/cursor/security/advisories/GHSA-v64q-396f-7m79",
-      "credit": "CVE-2025-61592, CVE-2025-64109; JFrog and others",
+      "credit": "CVE-2025-61592, Assaf Levkovich (JFrog); CVE-2025-64109, avivdon",
       "cves": ["CVE-2025-61592", "CVE-2025-64109"],
       "date": "2025-10-02",
       "harnesses": ["Cursor CLI"],
@@ -1228,7 +1227,7 @@
       "credit": "Adnan Khan",
       "date": "2026-02-09",
       "harnesses": ["Cline CLI"],
-      "fail": "A prompt injection in Cline's AI issue-triage workflow, followed by Actions cache poisoning, leaked its publish tokens. A third party then shipped `cline@2.3.0`, whose postinstall script installed OpenClaw on users' machines.",
+      "fail": "A prompt injection in Cline's AI issue-triage workflow, followed by Actions cache poisoning, leaked its publish tokens. Cline's rotation missed the npm token, and a third party then shipped `cline@2.3.0`, whose postinstall script installed OpenClaw on users' machines.",
       "fix": {
         "status": "fixed",
         "text": "Fixed in 2.4.0; publishing moved to OIDC."
@@ -1292,7 +1291,7 @@
       "credit": "Johann Rehberger",
       "date": "2025-08-13",
       "harnesses": ["Google Jules"],
-      "fail": "Instructions in a GitHub issue made the agent leak data through rendered images and its browsing tool, and download and run a command-and-control implant on its machine, which had unrestricted internet access; invisible Unicode tag characters in an issue also made it add backdoor code and run it.",
+      "fail": "Instructions in a GitHub issue made the agent leak data through rendered images and its browsing tool. In [follow-up posts](https://embracethered.com/blog/posts/2025/google-jules-remote-code-execution-zombai/), it downloaded and ran a command-and-control implant on its machine, which had unrestricted internet access, and [invisible Unicode tag characters](https://embracethered.com/blog/posts/2025/google-jules-invisible-prompt-injection/) in an issue made it add backdoor code and run it.",
       "fix": {
         "status": "unknown",
         "text": "— (reported May–June 2025; not fully mitigated at publication, per the researcher)"
