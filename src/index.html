@@ -24,7 +24,7 @@
 <link rel="icon" href="assets/favicon.ico" sizes="32x32">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<script>try{var theme=localStorage.getItem("<!-- build:theme-key -->");if(theme==="light"||theme==="dark"){document.documentElement.setAttribute("data-theme",theme)}}catch{}</script>
+<script>var theme="light";try{if(localStorage.getItem("<!-- build:theme-key -->")==="dark"){theme="dark"}}catch{}document.documentElement.setAttribute("data-theme",theme)</script>
 <link rel="stylesheet" href="assets/style.css">
 <script type="module" src="assets/site.js"></script>
 </head>
