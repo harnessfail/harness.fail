@@ -1,6 +1,66 @@
 {
   "shifts": [
     {
+      "date": "2026-11-18",
+      "title": "VS Code 1.147",
+      "url": "https://code.visualstudio.com/updates/v1_147#_permit-claude-and-codex-alongside-managed-settings",
+      "text": "Administrators can run harnesses that do not enforce their policy. Before, \"any Copilot enterprise-managed setting disabled the Claude and Codex harnesses, because they don't enforce those settings\"; now \"Administrators can now permit one or both harnesses by listing them in vscode.allowedHarnesses\". The release states the cost: \"Permitting a harness doesn't make it enforce your managed settings. Claude and Codex sessions run without Copilot's managed permission, sandbox, MCP, and plugin controls.\""
+    },
+    {
+      "date": "2026-11-17",
+      "title": "Claude Code 2.1.327",
+      "url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21327",
+      "text": "Shell start-up files run ahead of the permission decision, on by default: \"shell start-up files may now run before it's approved, even if it's refused; set `CLAUDE_CODE_DISABLE_SHELL_HEAD_START=1` to turn this off\"."
+    },
+    {
+      "date": "2026-11-13",
+      "title": "Claude Code 2.1.325",
+      "url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21325",
+      "text": "The sandbox stops standing in for the permission rules: \"Changed sandboxed Bash commands to follow the normal permission flow by default; set `sandbox.autoAllowBashIfSandboxed: true` to keep running them without prompts\"."
+    },
+    {
+      "date": "2026-11-13",
+      "title": "OpenAI Codex rust-v0.169.0",
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.169.0",
+      "text": "Repository configuration waits for trust in headless runs too: \"codex exec keeps project configuration and MCP servers disabled in untrusted directories, even with --sandbox workspace-write\"."
+    },
+    {
+      "date": "2026-11-06",
+      "title": "Claude Code 2.1.319",
+      "url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21319",
+      "text": "The model judge fails closed when its server check is missing: in auto mode with telemetry or feature flags off, \"calls the server can't check are asked about or denied, with no fallback to the built-in classifier\", unless `CLAUDE_CODE_AUTO_MODE_SERVER=0` is set."
+    },
+    {
+      "date": "2026-10-22",
+      "title": "VS Code 1.143",
+      "url": "https://code.visualstudio.com/updates/v1_143#_why-local-is-disabled",
+      "text": "Which harness may run now depends on whether it can enforce the policy: \"Copilot is required to enforce nonempty managed permissions.deny rules or sandbox.enabled: true\". The Local harness is being retired, and it \"cannot enforce runtime-only permission and sandbox controls\"; creating new Claude and Codex sessions \"remains disabled\" when policy requires the Copilot harness."
+    },
+    {
+      "date": "2026-10-19",
+      "title": "GitHub Copilot CLI v1.0.100",
+      "url": "https://github.com/github/copilot-cli/releases/tag/v1.0.100",
+      "text": "The decision-maker for managed ask rules moves from the user to Assisted mode's permission judge: \"Enterprise-managed ask permissions in Assisted mode now allow safe actions without unnecessary confirmation prompts.\""
+    },
+    {
+      "date": "2026-10-16",
+      "title": "goose v1.55.0",
+      "url": "https://github.com/aaif-goose/goose/releases/tag/v1.55.0",
+      "text": "Subagents carry their parent's policy: \"Bind subagents by their parent's hooks, mode and approvals\"."
+    },
+    {
+      "date": "2026-10-14",
+      "title": "Claude Code 2.1.299",
+      "url": "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21299",
+      "text": "Hook failures stop letting calls through: Windows PreToolUse and PermissionRequest hooks that set no shell were \"failing open when Git for Windows isn't installed; a guard that fails now blocks the call\", and actions a plugin hook can block are now \"refused, not let through, when the hook cannot be handed them or cannot hand back its answer\"."
+    },
+    {
+      "date": "2026-10-07",
+      "title": "Microsoft Windows",
+      "url": "https://blogs.windows.com/windowsdeveloper/2026/10/07/microsoft-execution-containers-policy-driven-containment-for-ai-agents/",
+      "text": "The OS gains a containment layer for agents: Microsoft Execution Containers are generally available, and \"Developers and IT administrators define the resources, like files and network destinations an agent can use and MXC uses the appropriate container to enforce those policies at runtime.\" Microsoft's premise: \"An agent cannot be its own security authority.\""
+    },
+    {
       "date": "2026-10-02",
       "title": "Apple macOS",
       "url": "https://developer.apple.com/news/?id=p6zjojqw",
