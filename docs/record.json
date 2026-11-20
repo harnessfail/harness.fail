@@ -9,7 +9,7 @@
   "homepage": "https://harness.fail/",
   "license": "CC-BY-4.0",
   "doi": "10.5281/zenodo.23199129",
-  "updated": "2026-10-08",
+  "updated": "2026-11-20",
   "classes": [
     {
       "id": "scaffolding-collapse",
@@ -396,6 +396,94 @@
         "text": "Fixed in OpenAI Codex CLI 0.131.0, Codex Desktop 26.519, goose 1.44.0 and Hermes Agent commit f6234d0; Claude Code fixed the `core.fsmonitor` path by 2.1.196 and Cursor patched, per Manifold; Claude Code's ultrareview, Grok Build and Qwen Code unpatched as of September 1, 2026."
       },
       "featured": true
+    },
+    {
+      "id": "claude-code-plugin-pin-bypass",
+      "class": "scaffolding-collapse",
+      "title": "Claude Code plugin pin bypass",
+      "url": "https://github.com/anthropics/claude-code/security/advisories/GHSA-pq7j-f95f-qfcv",
+      "credit": "CVE-2026-86063, Or Nevo Michrowski (Air Security)",
+      "cves": ["CVE-2026-86063"],
+      "date": "2026-10-09",
+      "harnesses": ["Claude Code", "Claude Desktop"],
+      "fail": "The plugin install flow checked out a marketplace's pinned commit SHA with `git checkout` without verifying that the resulting HEAD matched the pin, so an upstream repository could create a branch named after the 40-character SHA and have its branch tip installed instead of the reviewed commit, on git hosts that allow SHA-shaped branch names.",
+      "fix": {
+        "status": "fixed",
+        "text": "Fixed in Claude Code 2.1.179; the advisory names no Claude Desktop version."
+      }
+    },
+    {
+      "id": "claude-code-managed-settings-skipped",
+      "class": "scaffolding-collapse",
+      "title": "Claude Code managed settings skipped",
+      "url": "https://github.com/anthropics/claude-code/security/advisories/GHSA-gfvf-j8jh-jxxw",
+      "credit": "CVE-2026-103012, Tamas Voros (NVIDIA AI Red Team)",
+      "cves": ["CVE-2026-103012"],
+      "date": "2026-09-29",
+      "harnesses": ["Claude Code"],
+      "fail": "When the settings endpoint rejected a stored API key that Claude Code had preferred over the user's valid Enterprise or Team sign-in, the session \"started without the organization's server-managed policy (such as permission deny rules, model restrictions and managed-only locks)\", or kept a stale cached copy, while still working as the organization's account.",
+      "fix": {
+        "status": "fixed",
+        "text": "Fixed in Claude Code 2.1.260."
+      }
+    },
+    {
+      "id": "claude-code-write-time-symlink",
+      "class": "scaffolding-collapse",
+      "title": "Claude Code write-time symlink race",
+      "url": "https://github.com/anthropics/claude-code/security/advisories/GHSA-5j29-h97v-84ch",
+      "credit": "CVE-2026-103435, hackerone.com/c_h4ck_0",
+      "cves": ["CVE-2026-103435"],
+      "date": "2026-10-05",
+      "harnesses": ["Claude Code"],
+      "fail": "Claude Code checked that a target path was inside the project when it asked for permission, then resolved the path again at write time without checking, so anyone who could write to the workspace and win a race could swap a project file for a symlink and redirect a benign edit to a file outside the project, such as a shell configuration file.",
+      "fix": {
+        "status": "fixed",
+        "text": "Fixed in Claude Code 2.1.129."
+      }
+    },
+    {
+      "id": "claude-code-edit-tool-toctou",
+      "class": "scaffolding-collapse",
+      "title": "Claude Code Edit tool sandbox race",
+      "url": "https://github.com/anthropics/claude-code/security/advisories/GHSA-5xjx-9qx6-jcrv",
+      "credit": "CVE-2026-88968, Sunder Singh (hackerone.com/mahoraga007)",
+      "cves": ["CVE-2026-88968"],
+      "date": "2026-10-26",
+      "harnesses": ["Claude Code"],
+      "fail": "On macOS, code running inside Claude Code's Bash sandbox could swap a workspace directory for a symlink after the Edit tool had checked its target, so the unsandboxed Edit tool overwrote a user-writable file of the attacker's choosing outside the workspace.",
+      "fix": {
+        "status": "fixed",
+        "text": "Fixed in Claude Code 2.1.251."
+      }
+    },
+    {
+      "id": "cowork-folder-executable-file-type",
+      "class": "scaffolding-collapse",
+      "title": "Cowork folder executable file type",
+      "url": "https://github.com/anthropics/claude-code/security/advisories/GHSA-v234-4jrq-mgg6",
+      "credit": "identified by Anthropic; also reported by Vladimir Tokarev (Cyera Research)",
+      "date": "2026-09-25",
+      "harnesses": ["Claude Desktop", "Claude Cowork"],
+      "fail": "Claude Desktop blocks file types that run code when opened from a Cowork session's shared folder, but on macOS the list missed one, so a file written there \"by a compromised or prompt-injected agent\" could run commands on the user's Mac when opened; combined with an unpatched guest kernel, code that had gained elevated privileges in the VM could trigger the open itself.",
+      "fix": {
+        "status": "fixed",
+        "text": "Fixed in Claude Desktop 1.15962.0; the guest kernel was patched in 1.11847.5."
+      }
+    },
+    {
+      "id": "brig-project-mount-symlink",
+      "class": "scaffolding-collapse",
+      "title": "Brig project-mount symlink traversal",
+      "url": "https://github.com/brig-sh/brig/security/advisories/GHSA-wp6x-29qx-fpr7",
+      "credit": "Peyton Kennedy (Endor Labs); [write-up](https://www.endorlabs.com/learn/project-mount-symlink-traversal-in-brig-how-a-sandbox-reaches-host-directories-it-was-never-given)",
+      "date": "2026-09-26",
+      "harnesses": ["Brig"],
+      "fail": "Brig passed the project path to the runtime unresolved, so an agent could replace a project subdirectory with a symlink, and a later run narrowed to that subdirectory mounted the host directory it pointed to read-write into the sandbox, `~/.ssh` and `~/.aws` included.",
+      "fix": {
+        "status": "fixed",
+        "text": "Fixed in Brig 0.3.0."
+      }
     },
     {
       "id": "gemini-cli-hijack",
@@ -1005,7 +1093,8 @@
       "class": "scaffolding-collapse",
       "title": "Gemini CLI --yolo allowlist bypass",
       "url": "https://github.com/google-github-actions/run-gemini-cli/security/advisories/GHSA-wpqr-6v78-jr5g",
-      "credit": "Novee Security and Pillar Security",
+      "credit": "CVE-2026-12537, Novee Security and Pillar Security",
+      "cves": ["CVE-2026-12537"],
       "date": "2026-04-24",
       "harnesses": ["Gemini CLI"],
       "fail": "Under `--yolo`, Gemini CLI ignored the fine-grained tool allowlist, so `run_shell_command(echo)` allowed any command. In headless mode it also trusted the folder automatically and loaded environment variables from the local `.gemini/` directory.",
@@ -1161,6 +1250,20 @@
       }
     },
     {
+      "id": "downloads-folder-agents-md",
+      "class": "agent-instruction-file-injection",
+      "title": "Markdown Is the New Executable",
+      "url": "https://forever.security/blog/hijacking-ai-agents-via-downloads-folder",
+      "credit": "Gal Weizman and Omer Samet (Forever Security)",
+      "date": "2026-10-22",
+      "harnesses": ["OpenAI Codex CLI", "Claude Code"],
+      "fail": "An `AGENTS.md` of unknown origin found in a customer's `~/Downloads`, a folder a web page can download into, made Codex opened in that folder add an MCP server to its machine-wide `~/.codex/config.toml` and run a child `codex exec --dangerously-bypass-approvals-and-sandbox`, a flag the model wrote itself, in more than 90% of attempts; a `CLAUDE.md` Forever wrote got Claude Code to write an `ANTHROPIC_BASE_URL` into `.claude/settings.json`, with approval, about half the time.",
+      "fix": {
+        "status": "n/a",
+        "text": "— (Forever Security: \"There is nothing here for OpenAI or Anthropic to patch.\")"
+      }
+    },
+    {
       "id": "cursor-open-repo-get-pwned",
       "class": "ambient-activation",
       "title": "Open Repo, Get Pwned",
@@ -1231,6 +1334,20 @@
       "fix": {
         "status": "fixed",
         "text": "Fixed in 2.4.0; publishing moved to OIDC."
+      }
+    },
+    {
+      "id": "cursor-marketplace-claude-code-extension",
+      "class": "supply-chain-compromise",
+      "title": "Trojanized Claude Code extension on Cursor's VS Code extension marketplace",
+      "url": "https://cursor.com/blog/claude-code-extension-security-notice",
+      "credit": "Cursor; root cause in [Cursor's update](https://cursor.com/blog/security-incident-update)",
+      "date": "2026-10-29",
+      "harnesses": ["Cursor"],
+      "fail": "For about 11 hours, the Cursor VS Code Extension Marketplace served modified copies of Anthropic's Claude Code extension, versions 2.1.312 and 2.1.313, that tried to install a persistent SSH backdoor. The attacker placed them on the marketplace cache with a credential stolen from Cursor's internal systems, which it reached after an access key Cursor had issued to Fireworks was exposed and used to copy coding-agent traces containing unredacted credentials; \"Anthropic did not publish this copy\".",
+      "fix": {
+        "status": "fixed",
+        "text": "Malicious versions removed on October 29, 2026; Cursor rotated its keys, rebuilt the marketplace, and rotated every exposed Cursor credential it found."
       }
     },
     {
@@ -1340,6 +1457,20 @@
         "text": "Anthropic blocked `ps` in the Claude Code Security Review action and said it “is not designed to be hardened against prompt injection”; GitHub called the Copilot exposure “a previously identified architectural limitation”; no Gemini CLI fix stated."
       },
       "featured": true
+    },
+    {
+      "id": "backdooring-codex",
+      "class": "scaffolding-collapse",
+      "title": "Backdooring Codex",
+      "url": "https://depi.security/blog/20261111-backdooring-codex/",
+      "credit": "Pierre Martin (Worty) and Garance de la Brosse (Madder) (Depi)",
+      "date": "2026-11-11",
+      "harnesses": ["OpenAI Codex CLI"],
+      "fail": "A crafted GitHub issue could steer the `openai/codex-action` agent in the openai/codex repository's issue-labeler workflow (Depi demonstrated the chain on a test copy); inside its workspace-write sandbox, the writable `/tmp` exposed the runner's .NET debug pipes, through which the agent could read tokens the sandbox had stripped from its own environment, a path toward publishing the `@openai/codex` npm package.",
+      "fix": {
+        "status": "unknown",
+        "text": "— (Depi: \"OpenAI deployed a fix right away\"; no OpenAI publication)"
+      }
     },
     {
       "id": "cursor-cloud-agent-browser-escape",
